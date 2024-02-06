@@ -1,10 +1,13 @@
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { ref, toRef } from 'vue'
   import { ofetch } from 'ofetch'
   import { useTitle } from '@vueuse/core'
+  import { storeToRefs } from 'pinia'
+
   import { useSessionStore } from '@/stores/session'
-  import type { Post as PostType } from '@/utils/types'
   import { API, createAuthHeader } from '@/utils/api'
+
+  import type { Post as PostType } from '@/utils/types'
 
   import Post from '@/components/Post.vue'
 
@@ -14,56 +17,47 @@
   const DEFAULT_PAGE_SIZE = 10
 
   const sessionStore = useSessionStore()
-  const currentUser = sessionStore.user
+  const { user: currentUser } = storeToRefs(sessionStore)
 
   const posts = ref<PostType[]>([])
   const pageNumber = ref<number>(1)
 
-  if(currentUser.isGuest) {
-    try {
-      const newPosts = await ofetch<PostType[]>(API + '/posts/guest-feed', {
-        query: {
-          page_number: pageNumber.value,
-          page_size: DEFAULT_PAGE_SIZE,
-        },
-      })
-      posts.value = posts.value.concat(newPosts)
-    } catch(e) {
-      console.log(e)
-    }
-  } else {
-    try {
-      const newPosts = await ofetch<PostType[]>(API + '/posts/feed', {
-        query: {
-          page_number: pageNumber.value,
-          page_size: DEFAULT_PAGE_SIZE,
-        },
-        headers: {
-          authorization: createAuthHeader(currentUser.accessToken as string),
-        }
-      })
-      posts.value = posts.value.concat(newPosts)
-    } catch(e) {
-      console.log(e)
+  await fetchPosts()
+
+  async function fetchPosts() {
+    if(currentUser.value.isGuest) {
+      try {
+        const newPosts = await ofetch<PostType[]>(API + '/posts/guest-feed', {
+          query: {
+            page_number: pageNumber.value,
+            page_size: DEFAULT_PAGE_SIZE,
+          },
+        })
+        posts.value = posts.value.concat(newPosts)
+      } catch(e) {
+        console.log(e)
+      }
+    } else {
+      try {
+        const newPosts = await ofetch<PostType[]>(API + '/posts/feed', {
+          query: {
+            page_number: pageNumber.value,
+            page_size: DEFAULT_PAGE_SIZE,
+          },
+          headers: {
+            authorization: createAuthHeader(currentUser.value.accessToken as string),
+          }
+        })
+        posts.value = posts.value.concat(newPosts)
+      } catch(e) {
+        console.log(e)
+      }
     }
   }
-    // return useFetch<Post[]>(useApi() + '/posts/feed', {
-    //   query: {
-    //     page_number: page_number,
-    //     page_size: DEFAULT_PAGE_SIZE,
-    //   },
-    //   transform: (newPosts) => {
-    //     posts.value = posts.value.concat(newPosts)
-    //     return newPosts
-    //   },
-    //   headers: {
-    //     authorization: 'Bearer ' + currentUser.value.accessToken
-    //   },
-    // })
 </script>
 
 <template>
-  <div class="this h-full overflow-y-auto p-3 md:p-5 bg-neutral-900">
+  <div class="this space-y-3 md:space-y-5 h-full overflow-y-auto p-3 md:p-5 bg-neutral-900">
     <div v-for="post in posts" :key="post.id">
       <Post :post="post"/>
     </div>

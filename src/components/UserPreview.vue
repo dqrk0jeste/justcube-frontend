@@ -1,9 +1,10 @@
 <script setup lang="ts">
-  import type { User } from '../utils/types';
+  import type { User } from '@/utils/types';
 
   const { user } = defineProps<{
     user: User,
   }>()
+
 </script>
 
 <template>

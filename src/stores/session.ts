@@ -7,7 +7,5 @@ export const useSessionStore = defineStore('session', () => {
     isGuest: true,
   })
 
-  
-
   return { user }
 })

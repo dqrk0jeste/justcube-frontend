@@ -44,7 +44,7 @@
 </script>
 
 <template>
-  <div class="this h-full w-full overflow-y-auto grid place-items-center bg-neutral-900">
+  <div class="this h-full w-full overflow-y-auto grid place-items-center">
     <form @submit.prevent="loginUser()" class="max-w-[300px] w-full">
       <h1 class="text-3xl mb-5 text-center">welcome back</h1>
       <div>

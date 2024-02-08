@@ -3,11 +3,14 @@
 </script>
 
 <template>
-  <DefaultLayout>
+  <div class="max-w-[var(--max-width)] m-auto">
+    <DefaultLayout>
     <Suspense>
       <RouterView />
     </Suspense>
   </DefaultLayout>
+  </div>
+  
 </template>
 
 <style scoped>

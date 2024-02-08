@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, toRef } from 'vue'
+  import { ref } from 'vue'
   import { ofetch } from 'ofetch'
   import { useTitle } from '@vueuse/core'
   import { storeToRefs } from 'pinia'
@@ -83,4 +83,5 @@
     background-color: gray;
     border-radius: 5px;
   }
+  
 </style>

@@ -1,16 +1,18 @@
 <script setup lang="ts">
-  import { computed } from 'vue';
+  import { storeToRefs } from 'pinia'
+  import { computed } from 'vue'
+  
+  import { useSessionStore } from '@/stores/session'
 
-  // const currentUser = useCurrentUser()
+  const sessionStore = useSessionStore()
+  const { user: currentUser } = storeToRefs(sessionStore)
 
-  const username = 'darko'
-  // TODO: this should get it from the s3 bucket
-  const profileImage = 'https://placehold.co/50'
-  const profileLink = '/'
+  const username = computed(() => currentUser.value.isGuest ? 'login' : currentUser.value.userInfo?.username)
+  const profileImage = computed(() => currentUser.value.isGuest ? 'https://placehold.co/40' : `https://placehold.co/40`)
+  const profileLink = computed(() => currentUser.value.isGuest ? '/login' : `/users/${ currentUser.value.userInfo?.id }`)
 
 </script>
 
-TODO: add custom image and link based on current user
 <template>
   <header class="h-[var(--header-height)] px-1 md:px-3 relative flex items-center gap-3">
     <RouterLink :to="profileLink">

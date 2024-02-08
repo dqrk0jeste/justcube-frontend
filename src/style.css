@@ -6,9 +6,10 @@
 
 
 :root {
-  --nav-width-desktop: 220px;
+  --max-width: 1600px;
+  --nav-width-desktop: 235px;
   --nav-width-mobile: 50px;
-  --sidetab-width: 250px;
+  --sidetab-width: 235px;
   --header-height: 64px;
 }
 
@@ -21,4 +22,5 @@
 body {
   width: 100%;
   overflow: hidden;
+  background-color: black;
 }

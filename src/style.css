@@ -8,6 +8,7 @@
 :root {
   --nav-width-desktop: 220px;
   --nav-width-mobile: 50px;
+  --sidetab-width: 250px;
   --header-height: 64px;
 }
 

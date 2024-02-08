@@ -57,7 +57,7 @@
 </script>
 
 <template>
-  <div class="this space-y-3 md:space-y-5 h-full overflow-y-auto p-3 md:p-5 bg-neutral-900">
+  <div class="this space-y-3 md:space-y-5 h-full overflow-y-auto p-3">
     <div v-for="post in posts" :key="post.id">
       <Post :post="post"/>
     </div>
@@ -75,8 +75,8 @@
 
   .this::-webkit-scrollbar-track {
     background-color: transparent;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
   }
 
   .this::-webkit-scrollbar-thumb {

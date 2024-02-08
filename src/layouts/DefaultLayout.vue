@@ -9,7 +9,7 @@
     <Header />
     <div class="h-[calc(100dvh-var(--header-height)-3px)] md:h-[calc(100dvh-var(--header-height)-12px)] flex mx-1 md:mx-3 gap-2 md:gap-3">
       <Nav />
-      <main class="flex-1 rounded-3xl overflow-hidden">
+      <main class="flex-1 overflow-hidden">
         <slot />
       </main>
       <SideTab />

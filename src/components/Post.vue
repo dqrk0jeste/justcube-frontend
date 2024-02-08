@@ -1,22 +1,30 @@
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { computed, ref } from 'vue'
   import { ofetch } from 'ofetch'
+  import { useRoute } from 'vue-router'
 
   import { toDate, formatDate, timeSince } from '@/utils/date'
-  import { API } from '@/utils/api'
+  import { API, createAuthHeader } from '@/utils/api'
+  import { useSessionStore } from '@/stores/session'
 
-  import type { Post, PostComment } from '@/utils/types'
+  import type { Post, PostComment, User } from '@/utils/types'
 
   import UserPreview from './UserPreview.vue'
   import PostImages from './PostImages.vue'
+
+  const DEFAULT_PAGE_SIZE = 5
 
   const { post } = defineProps<{
     post: Post
   }>()
 
-  const commentsCount = ref<number>(1)
-  const comments = ref<PostComment[]>([])
+  const route = useRoute()
 
+  const commentsPageNumber  = ref<number>(1)
+  const comments = ref<PostComment[]>([])
+  const myCommentsCount = ref<number>(0)
+  // const commentsCount = computed(() => comments.value.length - myCommentsCount.value)
+  const noMoreComments = ref<boolean>(false)
   const commentsOpened = ref<boolean>(false)
   const comment = ref<string>('')
 
@@ -27,10 +35,14 @@
       const newComments = await ofetch<PostComment[]>(API + '/posts/comments', {
         query: {
           post_id: post.id,
-          page_number: commentsCount.value,
-          page_size: 5,
+          page_number: commentsPageNumber.value,
+          page_size: DEFAULT_PAGE_SIZE,
         },
       })
+      if(newComments.length < DEFAULT_PAGE_SIZE) {
+        noMoreComments.value = true
+      }
+      commentsPageNumber.value++
       comments.value = comments.value.concat(newComments)
     } catch(e) {
       console.log(e)
@@ -45,43 +57,63 @@
     commentsOpened.value = false
   }
 
-  // TODO
-  function sendComment() {
-    // do something meaningful here
-    console.log(comment.value)
+  // TODO: check authorization in some way, add loading state
+  async function sendComment() {
+    try {
+      const sessionStore = useSessionStore()
+      const data = await ofetch<PostComment>(API + '/posts/comments', {
+        method: 'POST',
+        body: {
+          content: comment.value,
+          post_id: post.id,
+        },
+        headers: {
+          authorization: createAuthHeader(sessionStore.user.accessToken as string)
+        }
+      })
+      comments.value.unshift({
+        id: data.id,
+        content: data.content,
+        user: sessionStore.user.userInfo as User,
+        created_at: data.created_at,
+      })
 
-    comment.value = ''
+      myCommentsCount.value++
+      setTimeout(() => comment.value = '', 3000)
+    } catch(e) {
+
+    }
+    
+  }
+
+  function checkForEnter(e: KeyboardEvent) {
+    if(e.key !== 'Enter') return;
+    sendComment()
   }
   
-  // TODO
+  // TODO: when chats are added this thing should improve 
   function sharePost() {
-    // copy the id something something
-    console.log(post.id)
+    navigator.clipboard.writeText(location.origin + '/posts/' + post.id)
+    console.log(location.origin + '/posts/' + post.id)
   }
 
 </script>
 
 <template>
-  <article class="w-full max-w-[800px] p-3 rounded-2xl bg-neutral-800">
+  <article class="w-full p-3 rounded-2xl bg-neutral-900">
     <div class="flex justify-between items-center w-full">
       <UserPreview :user="post.user"/>
       <div class="hidden md:block">
-        <p>
-          {{ formatDate(toDate(post.created_at)) }}
-        </p>
+        <p> {{ formatDate(toDate(post.created_at)) }} </p>
       </div>
     </div>
     <div class="mt-3 text-lg">
       {{ post.text_content }}
     </div>
-    <!-- TODO: add images here -->
     <div class="pt-3">
       <PostImages :id="post.id" :imageCount="post.image_count"/>
     </div>
-    <div>
-    </div>
     <div v-if="commentsOpened" class="px-3 pt-3">
-      <div class="bg-white h-[1px] w-1/2 mb-3"></div>
       <div class="mb-1" v-for="comment in comments" :key="comment.id">
         <RouterLink :to="`/users/${ comment.user.id }`" class="inline mr-2 text-md text-white font-bold cursor-pointer hover:underline">
           {{ comment.user.username }}
@@ -93,10 +125,10 @@
           </span>
         </p>
       </div>
-      <p @click="commentsCount++" class="text-blue-200 cursor-pointer text-center hover:underline underline-offset-2">read more...</p>
+      <p v-if="!noMoreComments" @click="fetchComments()" class="text-blue-200 cursor-pointer text-center hover:underline underline-offset-2">load more...</p>
     </div>
     <div class="w-full flex gap-3 items-center justify-end mt-3">
-      <input v-model="comment" v-if="commentsOpened" placeholder="leave a comment..." class="flex-1 outline-none rounded-full text-black px-5 py-3" type="text">
+      <input @keypress="checkForEnter" v-model="comment" v-if="commentsOpened" placeholder="leave a comment..." class="flex-1 outline-none rounded-full text-black px-5 py-3" type="text">
       <button v-if="commentsOpened" @click="sendComment()" class="flex items-center gap-2 w-[50px] justify-center aspect-square bg-white/10 rounded-full hover:bg-white/15">
         <i class='bx bx-navigation text-2xl'></i>
       </button>

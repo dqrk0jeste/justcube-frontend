@@ -15,6 +15,9 @@
   const username = ref<string>('')
   const password = ref<string>('')
 
+  const loginPending = ref<boolean>(false)
+  const loginError = ref<any>(null)
+
   async function loginUser() {
     type LoginResponse = {
       access_token: string,
@@ -22,6 +25,7 @@
     }
 
     try {
+      loginPending.value = true
       const data = await ofetch<LoginResponse>(API + '/users/login', {
         method: 'POST',
         body: {
@@ -38,8 +42,12 @@
       }
       router.push('/')
     } catch(e: any) {
-      console.log(e)
+      loginError.value = e
+      setTimeout(() => {
+        loginError.value = null
+      }, 2000)
     }
+    loginPending.value = false
   }
 </script>
 
@@ -57,8 +65,14 @@
         <p class="mt-1 mr-3 text-right text-md text-gray-200">
           <RouterLink to="/login">forgot password?</RouterLink>
         </p>
+        <div class="w-full flex justify-center">
+          
+        </div>
       </div>
-      <button type="submit" class="bg-blue-200 w-full p-3 mt-3 rounded-full text-lg font-bold text-black hover:bg-blue-300 transition-color">login</button>
+      <button type="submit" class="w-full h-[52px] mt-3 rounded-full text-lg font-bold transition-color" :class="loginError ? 'bg-red-400' : 'bg-blue-200 hover:bg-blue-300'" :disabled="loginError">
+        <i v-if="loginPending" class='bx bx-loader-circle bx-spin text-2xl text-black'></i>
+        <span v-else class="text-black">login</span>
+      </button>
       <p class="mt-2 text-center text-md text-gray-200">don't have an account? <RouterLink to="/signup" class="text-blue-200">sign up</RouterLink></p>
     </form>
   </div>

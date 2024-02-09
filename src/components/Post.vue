@@ -1,12 +1,7 @@
 <script setup lang="ts">
-  import { ref } from 'vue'
-  import { ofetch } from 'ofetch'
+  import { toDate, formatDate } from '@/utils/date'
 
-  import { toDate, formatDate, timeSince } from '@/utils/date'
-  import { API, createAuthHeader } from '@/utils/api'
-  import { useSessionStore } from '@/stores/session'
-
-  import type { Post, PostComment, User } from '@/utils/types'
+  import type { Post } from '@/utils/types'
 
   const { post } = defineProps<{
     post: Post
@@ -28,7 +23,7 @@
     <div class="mt-3 text-lg">
       {{ post.text_content }}
     </div>
-    <div class="pt-3">
+    <div v-if="post.image_count > 0" class="pt-3">
       <PostImages :id="post.id" :imageCount="post.image_count"/>
     </div>
     <div>

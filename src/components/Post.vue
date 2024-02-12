@@ -13,7 +13,7 @@
 </script>
 
 <template>
-  <article class="w-full p-3 rounded-2xl bg-neutral-900">
+  <article class="w-full p-3 rounded-2xl bg-neutral-900" >
     <div class="flex justify-between items-center w-full">
       <UserPreview :user="post.user"/>
       <div class="hidden md:block">

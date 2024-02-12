@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { ref } from 'vue'
   import { RouterLink, useRouter } from 'vue-router'
-  import { useTitle } from '@vueuse/core'
+  import { useLocalStorage, useTitle } from '@vueuse/core'
   import { ofetch } from 'ofetch'
   import { useSessionStore } from '@/stores/session'
   import { API } from '@/utils/api'
@@ -21,6 +21,7 @@
   async function loginUser() {
     type LoginResponse = {
       access_token: string,
+      refresh_token: string,
       user: User,
     }
 
@@ -33,13 +34,15 @@
           password: password.value,
         },
       })
-      const sessionStore = useSessionStore()
 
+      const sessionStore = useSessionStore()
       sessionStore.user = {
         isGuest: false,
         userInfo: data.user,
         accessToken: data.access_token,
       }
+
+      useLocalStorage('refresh-token', data.refresh_token)
       router.push('/')
     } catch(e: any) {
       loginError.value = e

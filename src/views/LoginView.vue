@@ -73,7 +73,7 @@
         </div>
       </div>
       <button type="submit" class="w-full h-[52px] mt-3 rounded-full text-lg font-bold transition-color" :class="loginError ? 'bg-red-400' : 'bg-blue-200 hover:bg-blue-300'" :disabled="loginError">
-        <i v-if="loginPending" class='bx bx-loader-circle bx-spin text-2xl text-black'></i>
+        <box-icon name="loader-circle" v-if="loginPending" animation="spin"></box-icon>
         <span v-else class="text-black">login</span>
       </button>
       <p class="mt-2 text-center text-md text-gray-200">don't have an account? <RouterLink to="/signup" class="text-blue-200">sign up</RouterLink></p>

@@ -9,13 +9,13 @@
 
   import type { PostComment, User } from '@/utils/types'
 
-  // import CommentReplies from './CommentReplies.vue'
+  import CommentReplies from './CommentReplies.vue'
 
   const DEFAULT_PAGE_SIZE = 5
   const MAX_COMMENT_LENGTH = 200
 
   const { id } = defineProps<{
-    id: string
+    id: string,
   }>()
 
   const sessionStore = useSessionStore()
@@ -89,6 +89,7 @@
         id: data.id,
         content: data.content,
         user: sessionStore.user.userInfo as User,
+        number_of_replies: 0,
         created_at: data.created_at,
       })
       comment.value = ''
@@ -134,12 +135,11 @@
         </span>
       </p>
 
-      <!-- <CommentReplies :id="comment.id" /> -->
-
+      <CommentReplies v-if="comment.number_of_replies > 0" :id="comment.id" />
     </div>
 
     <p v-if="hasMoreComments && !getCommentsPending" @click="fetchComments()" class="ml-5 text-blue-200 cursor-pointer hover:underline underline-offset-2">load more...</p>
-    <i v-else-if="getCommentsPending" class='bx bx-loader-circle bx-spin text-2xl'></i>
+    <box-icon name="loader-circle" v-if="getCommentsPending" animation="spin"></box-icon>
 
   </div>
   <div class="w-full flex gap-3 items-center justify-end mt-3">
@@ -147,20 +147,20 @@
     <input @keypress="checkForEnter" v-model="comment" v-if="commentsOpened" :placeholder="currentUser.isGuest ? 'please login to comment' : 'leave a comment...'" class="flex-1 outline-none rounded-full text-black px-5 py-3" type="text" :maxlength="MAX_COMMENT_LENGTH" :disabled="currentUser.isGuest">
 
     <button v-if="commentsOpened" @click="sendComment()" class="flex items-center gap-2 w-[50px] justify-center aspect-square bg-white/10 rounded-full hover:bg-white/15" :disabled="currentUser.isGuest || sendCommentPending || comment.length < 1">
-      <i v-if="sendCommentPending" class='bx bx-loader-circle bx-spin text-2xl'></i>
-      <i v-else class='bx bx-navigation text-2xl'></i>
+      <box-icon name="loader-circle" v-if="sendCommentPending" animation="spin"></box-icon>
+      <box-icon name="navigation" color="white" v-else></box-icon>
     </button>
 
     <button @click="sharePost()" class="flex items-center gap-2 w-[50px] justify-center aspect-square bg-white/10 rounded-full hover:bg-white/15">
-      <i class='bx bx-share text-2xl'></i>
+      <box-icon name="share" color="white"></box-icon>
     </button>
 
     <button v-if="commentsOpened" @click="closeComments()" class="flex items-center gap-2 w-[50px] justify-center aspect-square bg-blue-200 rounded-full transition-color hover:bg-blue-300">
-      <i class='bx bx-x text-4xl text-black'></i>
+      <box-icon name="x" color="black" size="md"></box-icon>
     </button>
 
     <button v-if="!commentsOpened" @click="openComments()" class="flex items-center gap-2 w-[50px] justify-center aspect-square bg-white/10 rounded-full hover:bg-white/15">
-      <i class='bx bx-message-square-dots text-2xl'></i>
+      <box-icon name="message-square-dots" color="white"></box-icon>
     </button>
 
   </div>

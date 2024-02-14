@@ -20,6 +20,7 @@
   const { user: currentUser } = storeToRefs(sessionStore)
 
   const posts = ref<PostType[]>([])
+  const error = ref<any>(null)
   const pageNumber = ref<number>(1)
 
   await fetchPosts()
@@ -34,8 +35,10 @@
           },
         })
         posts.value = posts.value.concat(newPosts)
+        pageNumber.value++
       } catch(e) {
         console.log(e)
+        error.value = e
       }
     } else {
       try {
@@ -49,23 +52,28 @@
           }
         })
         posts.value = posts.value.concat(newPosts)
+        pageNumber.value++
       } catch(e) {
         console.log(e)
+        error.value = e
       }
     }
   }
 </script>
 
 <template>
-  <div class="this space-y-3 md:space-y-5 h-full overflow-y-auto p-3">
+  <div v-if="error" class="grid place-items-center py-10 text-xl">
+    there has been an error.
+    <button @click="fetchPosts" class="hover:underline underline-offset-2 text-blue-200">
+      try again?
+    </button>
+  </div>
+  <div v-else class="this space-y-3 md:space-y-5 h-full overflow-y-auto p-3">
     <div v-for="post in posts" :key="post.id">
       <Post :post="post"/>
     </div>
-    <!-- TODO: make these nicer -->
-    <!-- <div v-if="newPostsPending">loading...</div>
-    <div v-else-if="newPostsError">there has been an error</div>
-    <button @click="page_number++" class="border-white border-2 p-3">FETCH MORE POSTS</button> -->
   </div>
+  
 </template>
 
 <style scoped>

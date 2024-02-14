@@ -16,6 +16,7 @@ export type PostComment = {
   id: string,
   content: string,
   user: User,
+  number_of_replies: number,
   created_at: string,
 }
 

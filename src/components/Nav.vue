@@ -13,19 +13,19 @@
   <!-- mobile nav -->
   <nav class="flex lg:hidden w-[var(--nav-width-mobile)] flex-col gap-4 justify-start">
     <RouterLink to="/" class="w-full aspect-square rounded-full bg-neutral-900 flex items-center justify-center">
-      <i class='bx bx-news text-2xl'></i>
+      <box-icon name="news" color="white"></box-icon>
     </RouterLink>
     <RouterLink to="/" class="w-full aspect-square rounded-full bg-neutral-900 flex items-center justify-center">
-      <i class='bx bx-stopwatch text-2xl'></i>
+      <box-icon name="stopwatch" color="white"></box-icon>
     </RouterLink>
     <RouterLink to="/" class="w-full aspect-square rounded-full bg-neutral-900 flex items-center justify-center">
-      <i class='bx bx-cube-alt text-2xl'></i>
+      <box-icon name="cube-alt" color="white"></box-icon>
     </RouterLink>
     <RouterLink to="/" class="w-full aspect-square rounded-full bg-neutral-900 flex items-center justify-center">
-      <i class='bx bx-user text-2xl'></i>
+      <box-icon name="user" color="white"></box-icon>
     </RouterLink>
     <RouterLink to="/" class="w-full aspect-square rounded-full bg-neutral-900 flex items-center justify-center">
-      <i class='bx bx-search text-2xl'></i>
+      <box-icon name="search" color="white"></box-icon>
     </RouterLink>
   </nav>
 </template>

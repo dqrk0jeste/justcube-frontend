@@ -20,6 +20,13 @@ export type PostComment = {
   created_at: string,
 }
 
+export type CommentReply = {
+  id: string,
+  content: string,
+  user: User,
+  created_at: string,
+}
+
 export type SessionUser = {
   userInfo?: User,
   accessToken?: string,

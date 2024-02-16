@@ -7,15 +7,19 @@
 <template>
   <div class="max-w-[var(--max-width)] m-auto">
     <DefaultLayout>
-    <Suspense>
-      <RouterView />
-      <template #fallback>
-        <div class="text-4xl grid place-items-center">
-          Loading...
-        </div>
-      </template>
-    </Suspense>
-  </DefaultLayout>
+      <RouterView v-slot="{ Component }">
+        <template v-if="Component">
+          <Suspense>
+            <component :is="Component"></component>
+            <template #fallback>
+              <div class="h-full text-4xl grid place-items-center">
+                Loading...
+              </div>
+            </template>
+          </Suspense>
+        </template>
+      </RouterView>
+    </DefaultLayout>
   </div>
   
 </template>

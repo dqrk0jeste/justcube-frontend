@@ -34,7 +34,8 @@
             page_size: DEFAULT_PAGE_SIZE,
           },
         })
-        posts.value = posts.value.concat(newPosts)
+        posts.value.push(...newPosts)
+        error.value = null
         pageNumber.value++
       } catch(e) {
         console.log(e)
@@ -51,7 +52,8 @@
             authorization: createAuthHeader(currentUser.value.accessToken as string),
           }
         })
-        posts.value = posts.value.concat(newPosts)
+        posts.value.push(...newPosts)
+        error.value = null
         pageNumber.value++
       } catch(e) {
         console.log(e)
@@ -68,7 +70,7 @@
       try again?
     </button>
   </div>
-  <div v-else class="this space-y-3 md:space-y-5 h-full overflow-y-auto p-3">
+  <div v-else class="this space-y-3 md:space-y-5 h-full overflow-y-auto px-3">
     <div v-for="post in posts" :key="post.id">
       <Post :post="post"/>
     </div>

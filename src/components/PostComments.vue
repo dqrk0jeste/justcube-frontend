@@ -54,7 +54,7 @@
 
       commentsPageNumber.value++
       getCommentsError.value = null
-      comments.value = comments.value.concat(newComments)
+      comments.value.push(...newComments)
     } catch(e) {
       getCommentsError.value = e
     }
@@ -122,23 +122,27 @@
     <p v-if="getCommentsError" class="text-red-500">there has been an error loading comments</p>
     <p v-else-if="comments.length === 0">no comments yet. be the first one to comment</p>
 
-    <div class="mb-1" v-for="comment in comments" :key="comment.id">
+    <div class="space-y-1">
 
-      <RouterLink :to="`/users/${ comment.user.id }`" class="inline mr-2 text-md text-white font-bold cursor-pointer hover:underline">
-        {{ comment.user.username }}
-      </RouterLink>
+      <div v-for="comment in comments" :key="comment.id">
 
-      <p class="inline line-height-3">
-        {{ comment.content }}
-        <span class="text-sm text-gray-400">
-          {{ timeSince(toDate(comment.created_at)) }}
-        </span>
-      </p>
+        <RouterLink :to="`/users/${ comment.user.id }`" class="inline mr-2 text-md text-white font-bold cursor-pointer hover:underline">
+          {{ comment.user.username }}
+        </RouterLink>
 
-      <CommentReplies v-if="comment.number_of_replies > 0" :id="comment.id" />
+        <p class="inline line-height-3">
+          {{ comment.content }}
+          <span class="text-sm text-gray-400">
+            {{ timeSince(toDate(comment.created_at)) }}
+          </span>
+        </p>
+
+        <CommentReplies v-if="comment.number_of_replies > 0" :id="comment.id" />
+      </div>
+
     </div>
 
-    <p v-if="hasMoreComments && !getCommentsPending" @click="fetchComments()" class="ml-5 text-blue-200 cursor-pointer hover:underline underline-offset-2">load more...</p>
+    <p v-if="hasMoreComments && !getCommentsPending" @click="fetchComments()" class="ml-5 text-blue-200 cursor-pointer hover:underline underline-offset-2">see more...</p>
     <box-icon name="loader-circle" v-if="getCommentsPending" animation="spin"></box-icon>
 
   </div>

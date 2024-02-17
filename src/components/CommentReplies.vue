@@ -56,8 +56,14 @@
 </script>
 
 <template>
-  <button  v-if="!repliesOpened" @click="openReplies()" class="block text-md ml-3 text-gray-300 hover:underline underline-offset-2">see replies</button>
-  <div v-else class="px-3">
+  <button
+    v-show="!repliesOpened"
+    @click="openReplies()"
+    class="block text-md ml-3 text-gray-300 hover:underline underline-offset-2"
+  >
+    see replies
+  </button>
+  <div v-show="repliesOpened" class="px-3">
 
     <p v-if="getRepliesError" class="text-red-500">there has been an error loading replies</p>
 
@@ -65,7 +71,10 @@
 
       <div v-for="reply in replies" :key="reply.id">
 
-        <RouterLink :to="`/users/${ reply.user.id }`" class="inline mr-2 text-md text-white font-bold cursor-pointer hover:underline">
+        <RouterLink
+          :to="`/users/${ reply.user.id }`"
+          class="inline mr-2 text-md text-white font-bold cursor-pointer hover:underline"
+        >
           {{ reply.user.username }}
         </RouterLink>
 
@@ -80,8 +89,18 @@
 
     </div>
 
-    <p v-if="hasMoreReplies && !getRepliesPending" @click="fetchReplies()" class="ml-5 text-blue-200 cursor-pointer hover:underline underline-offset-2">see more...</p>
-    <box-icon v-if="getRepliesPending" name="loader-circle" animation="spin"></box-icon>
+    <p
+      v-if="hasMoreReplies && !getRepliesPending"
+      @click="fetchReplies()"
+      class="ml-5 text-blue-200 cursor-pointer hover:underline underline-offset-2"
+    >
+      see more...
+    </p>
+    <box-icon
+      v-if="getRepliesPending"
+      name="loader-circle"
+      animation="spin"
+    ></box-icon>
 
   </div>
 </template>

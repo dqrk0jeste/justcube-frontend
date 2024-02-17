@@ -64,9 +64,9 @@
 </script>
 
 <template>
-  <div v-if="error" class="grid place-items-center py-10 text-xl">
+  <div v-if="error" class="text-center py-10 text-xl">
     there has been an error.
-    <button @click="fetchPosts" class="hover:underline underline-offset-2 text-blue-200">
+    <button @click="fetchPosts()" class="hover:underline underline-offset-2 text-blue-200">
       try again?
     </button>
   </div>

@@ -9,7 +9,7 @@
 
   import UserPreview from './UserPreview.vue'
   import PostImages from './PostImages.vue'
-  import PostComments from './PostComments.vue'
+  import PostFooter from './PostFooter.vue'
 </script>
 
 <template>
@@ -27,7 +27,7 @@
       <PostImages :id="post.id" :imageCount="post.image_count"/>
     </div>
     <div>
-      <PostComments :id="post.id"/>
+      <PostFooter :id="post.id"/>
     </div>
   </article>
 </template>

@@ -7,9 +7,9 @@
   import { API, createAuthHeader } from '@/utils/api'
   import { useSessionStore } from '@/stores/session'
 
-  import type { PostComment, User } from '@/utils/types'
+  import type { PostComment as PostCommentType, User } from '@/utils/types'
 
-  import CommentReplies from './CommentReplies.vue'
+  import PostComment from './PostComment.vue'
 
   const DEFAULT_PAGE_SIZE = 5
   const MAX_COMMENT_LENGTH = 200
@@ -23,7 +23,7 @@
   
   const commentsOpened = ref<boolean>(false)
 
-  const comments = ref<PostComment[]>([])
+  const comments = ref<PostCommentType[]>([])
   const getCommentsError = ref<any>(null)
   const getCommentsPending = ref<boolean>(false)
 
@@ -40,7 +40,7 @@
   async function fetchComments() {
     try {
       getCommentsPending.value = true
-      const newComments = await ofetch<PostComment[]>(API + '/posts/comments', {
+      const newComments = await ofetch<PostCommentType[]>(API + '/posts/comments', {
         query: {
           post_id: id,
           page_number: commentsPageNumber.value,
@@ -75,7 +75,7 @@
   async function sendComment() {
     try {
       sendCommentPending.value = true
-      const data = await ofetch<PostComment>(API + '/posts/comments', {
+      const data = await ofetch<PostCommentType>(API + '/posts/comments', {
         method: 'POST',
         body: {
           content: comment.value,
@@ -117,7 +117,7 @@
 </script>
 
 <template>
-  <div v-if="commentsOpened" class="px-3 pt-3">
+  <div v-show="commentsOpened" class="px-3 pt-3">
 
     <p v-if="getCommentsError" class="text-red-500">there has been an error loading comments</p>
     <p v-else-if="comments.length === 0">no comments yet. be the first one to comment</p>
@@ -125,50 +125,74 @@
     <div class="space-y-1">
 
       <div v-for="comment in comments" :key="comment.id">
-
-        <RouterLink :to="`/users/${ comment.user.id }`" class="inline mr-2 text-md text-white font-bold cursor-pointer hover:underline">
-          {{ comment.user.username }}
-        </RouterLink>
-
-        <p class="inline line-height-3">
-          {{ comment.content }}
-          <span class="text-sm text-gray-400">
-            {{ timeSince(toDate(comment.created_at)) }}
-          </span>
-        </p>
-
-        <CommentReplies v-if="comment.number_of_replies > 0" :id="comment.id" />
+        <PostComment :comment="comment" />
       </div>
 
     </div>
 
-    <p v-if="hasMoreComments && !getCommentsPending" @click="fetchComments()" class="ml-5 text-blue-200 cursor-pointer hover:underline underline-offset-2">see more...</p>
+    <p
+      v-if="hasMoreComments && !getCommentsPending"
+      @click="fetchComments()"
+      class="ml-5 text-blue-200 cursor-pointer hover:underline underline-offset-2"
+    >
+      see more...
+    </p>
     <box-icon name="loader-circle" v-if="getCommentsPending" animation="spin"></box-icon>
 
   </div>
   <div class="w-full flex gap-3 items-center justify-end mt-3">
 
-    <input @keypress="checkForEnter" v-model="comment" v-if="commentsOpened" :placeholder="currentUser.isGuest ? 'please login to comment' : 'leave a comment...'" class="flex-1 outline-none rounded-full text-black px-5 py-3" type="text" :maxlength="MAX_COMMENT_LENGTH" :disabled="currentUser.isGuest">
+    <input
+      @keypress="checkForEnter"
+      v-model="comment"
+      v-if="commentsOpened"
+      :placeholder="currentUser.isGuest ? 'please login to comment' : 'leave a comment...'"
+      class="flex-1 outline-none rounded-full text-black px-5 py-3 min-w-0"
+      type="text"
+      :maxlength="MAX_COMMENT_LENGTH"
+      :disabled="currentUser.isGuest"
+    >
 
-    <button v-if="commentsOpened" @click="sendComment()" class="flex items-center gap-2 w-[50px] justify-center aspect-square bg-white/10 rounded-full hover:bg-white/15" :disabled="currentUser.isGuest || sendCommentPending || comment.length < 1">
+    <button
+      v-if="commentsOpened"
+      @click="sendComment()"
+      class="flex items-center gap-2 w-[50px] justify-center aspect-square bg-white/10 rounded-full hover:bg-white/15" 
+      :disabled="currentUser.isGuest || sendCommentPending || comment.length < 1"
+    >
       <box-icon name="loader-circle" v-if="sendCommentPending" animation="spin"></box-icon>
       <box-icon name="navigation" color="white" v-else></box-icon>
     </button>
 
-    <button @click="sharePost()" class="flex items-center gap-2 w-[50px] justify-center aspect-square bg-white/10 rounded-full hover:bg-white/15">
+    <button
+      @click="sharePost()"
+      class="flex items-center gap-2 w-[50px] justify-center aspect-square bg-white/10 rounded-full hover:bg-white/15"
+    >
       <box-icon name="share" color="white"></box-icon>
     </button>
 
-    <button v-if="commentsOpened" @click="closeComments()" class="flex items-center gap-2 w-[50px] justify-center aspect-square bg-blue-200 rounded-full transition-color hover:bg-blue-300">
+    <button
+      v-if="commentsOpened"
+      @click="closeComments()"
+      class="flex items-center gap-2 w-[50px] justify-center aspect-square bg-blue-200 rounded-full transition-color hover:bg-blue-300"
+    >
       <box-icon name="x" color="black" size="md"></box-icon>
     </button>
 
-    <button v-if="!commentsOpened" @click="openComments()" class="flex items-center gap-2 w-[50px] justify-center aspect-square bg-white/10 rounded-full hover:bg-white/15">
+    <button
+      v-if="!commentsOpened"
+      @click="openComments()"
+      class="flex items-center gap-2 w-[50px] justify-center aspect-square bg-white/10 rounded-full hover:bg-white/15"
+    >
       <box-icon name="message-square-dots" color="white"></box-icon>
     </button>
 
   </div>
-  <p v-if="commentsOpened && sendCommentError" class="ml-5 mt-3 text-red-500">
+
+  <p
+    v-if="commentsOpened && sendCommentError"
+    class="ml-5 mt-3 text-red-500"
+  >
     there has been an error, please try again
   </p>
+
 </template>

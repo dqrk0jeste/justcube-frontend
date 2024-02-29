@@ -3,12 +3,13 @@
   import { RouterLink, useRouter } from 'vue-router'
   import { useTitle } from '@vueuse/core'
   import { ofetch } from 'ofetch'
-  import { useSessionStore } from '@/stores/session'
+
   import { API } from '@/utils/api'
+  
   import type { User } from '@/utils/types'
 
   const title = useTitle()
-  title.value = "let's cube | sigup"
+  title.value = `let's cube | signup`
 
   const router = useRouter()
 

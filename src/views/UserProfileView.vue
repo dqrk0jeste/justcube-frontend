@@ -10,8 +10,8 @@
 
   import type { Post as PostType, User } from '@/utils/types'
 
-  import Post from '@/components/Post.vue'
-  import UserProfile from '@/components/UserProfile.vue'
+  import Post from '@/components/posts/Post.vue'
+  import UserProfile from '@/components/users/UserProfile.vue'
 
   const route = useRoute()
   const userId = route.params.id

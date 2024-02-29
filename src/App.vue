@@ -10,7 +10,9 @@
       <RouterView v-slot="{ Component }">
         <template v-if="Component">
           <Suspense>
-            <component :is="Component"></component>
+            <!-- <KeepAlive> -->
+              <component :is="Component" />
+            <!-- </KeepAlive> -->
             <template #fallback>
               <div class="h-full text-4xl grid place-items-center">
                 Loading...

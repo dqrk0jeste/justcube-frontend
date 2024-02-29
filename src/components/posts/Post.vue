@@ -7,7 +7,7 @@
     post: Post
   }>()
 
-  import UserPreview from './UserPreview.vue'
+  import UserPreview from '../users/UserPreview.vue'
   import PostImages from './PostImages.vue'
   import PostFooter from './PostFooter.vue'
 </script>

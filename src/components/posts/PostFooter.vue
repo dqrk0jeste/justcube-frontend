@@ -3,7 +3,6 @@
   import { ofetch } from 'ofetch'
   import { storeToRefs } from 'pinia'
 
-  import { toDate, timeSince } from '@/utils/date'
   import { API, createAuthHeader } from '@/utils/api'
   import { useSessionStore } from '@/stores/session'
 

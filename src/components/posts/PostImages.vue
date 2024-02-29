@@ -1,8 +1,6 @@
 <script setup lang="ts">
-  import { ref } from 'vue'
   import { Swiper as SwiperComp, SwiperSlide } from 'swiper/vue'
   import { Pagination, Zoom, Navigation } from 'swiper/modules'
-
 
   import 'swiper/css'
   import 'swiper/css/zoom'
@@ -28,7 +26,7 @@
       :pagination="{ progressbarOpposite: true, clickable: true, }"
       :navigation="{ nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev', }"
       :zoom="{ maxRatio: 3 }"
-      >
+    >
       <SwiperSlide v-for="i in imageCount">
         <div class="w-full h-full flex items-center rounded-lg swiper-zoom-container">
           <img :src="`https://letscube.s3.eu-north-1.amazonaws.com/${ id }_${ i - 1 }.jpg`" alt="">
@@ -50,7 +48,6 @@
     color: white;
     padding: 10px;
   }
-
 
   .swiper-button-disabled {
     display: none;

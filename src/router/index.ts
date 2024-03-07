@@ -1,10 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import HomeView from '@/views/HomeView.vue'
-import LoginView from '@/views/LoginView.vue'
-import SignupView from '@/views/SignupView.vue'
-import UserProfileView from '@/views/UserProfileView.vue'
-import NotFoundView from '@/views/NotFoundView.vue'
+import { useTitle } from '@vueuse/core'
+
+function setTitle(title: string) {
+  const titleRef = useTitle()
+  titleRef.value = `let's cube | ${ title }`
+}
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -12,28 +13,52 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView,
+      component: () => import('@/views/HomeView.vue'),
+      beforeEnter() {
+        setTitle('home')
+      }
+      
+    },
+    {
+      path: '/posts/:id',
+      name: 'posts',
+      component: () => import('@/views/PostView.vue'),
+      beforeEnter() {
+        setTitle('post')
+      }
       
     },
     {
       path: '/login',
       name: 'login',
-      component: LoginView,
+      component: () => import('@/views/LoginView.vue'),
+      beforeEnter() {
+        setTitle('login')
+      }
     },
     {
       path: '/signup',
       name: 'signup',
-      component: SignupView,
-    },
+      component: () => import('@/views/SignupView.vue'),
+      beforeEnter() {
+        setTitle('signup')
+      }
+   },
     {
       path: '/users/:id',
       name: 'users',
-      component: UserProfileView,
+      component: () => import('@/views/UserProfileView.vue'),
+      beforeEnter() {
+        setTitle('user')
+      }
     },
     {
       path: '/:pathMatch(.*)*',
       name: '404',
-      component: NotFoundView,
+      component: () => import('@/views/NotFoundView.vue'),
+      beforeEnter() {
+        setTitle('not found')
+      }
     }
   ]
 })

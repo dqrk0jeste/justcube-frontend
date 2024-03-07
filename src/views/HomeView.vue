@@ -10,9 +10,9 @@
   import type { Post as PostType } from '@/utils/types'
 
   import Post from '@/components/posts/Post.vue'
+  import PostFooterFeed from '@/components/posts/PostFooterFeed.vue'
 
-  const title = useTitle()
-  title.value = `let's cube | home`
+  // TODO: add infinite scroll here
 
   const DEFAULT_PAGE_SIZE = 10
 
@@ -34,7 +34,7 @@
 
     let pageNumber = 1
 
-    watch(currentUser, () => {
+    watch(() => currentUser.value.userInfo, () => {
       posts.value = []
       pageNumber = 1
       _fetchPosts()
@@ -81,7 +81,7 @@
 
     _fetchPosts()
 
-    const promise = new Promise<useFetchPostsReturn>(async (resolve) => {
+    return new Promise<useFetchPostsReturn>(async (resolve) => {
       await until(isFetching).toBe(false)
       return resolve({
         posts,
@@ -89,29 +89,24 @@
         fetchMore: _fetchPosts,
       })
     })
-
-    return {
-      then(resolved) {
-        return promise.then(resolved)
-      }
-    }
   }
 </script>
 
 <template>
-  <div v-if="error" class="text-center py-10 text-xl">
-    there has been an error.
-    <button @click="fetchMore()" class="hover:underline underline-offset-2 text-blue-200">
-      try again?
-    </button>
-  </div>
-  <div v-else class="this space-y-3 md:space-y-5 h-full overflow-y-auto px-3">
+  <div class="this space-y-3 md:space-y-5 h-full overflow-y-auto px-3">
     <div v-for="post in posts" :key="post.id">
-      <Post :post="post"/>
+      <Post :post="post">
+        <PostFooterFeed :id="post.id" />  
+      </Post>
+    </div>
+    <div v-if="error" class="text-center py-10 text-xl">
+      there has been an error.
+      <button @click="fetchMore()" class="hover:underline underline-offset-2 text-blue-200">
+        try again?
+      </button>
     </div>
     <button @click="fetchMore()">click</button>
   </div>
-  
 </template>
 
 <style scoped>

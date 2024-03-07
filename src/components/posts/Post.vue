@@ -1,33 +1,31 @@
 <script setup lang="ts">
-  import { toDate, formatDate } from '@/utils/date'
+import { toDate, formatDate } from '@/utils/date'
 
-  import type { Post } from '@/utils/types'
+import type { Post } from '@/utils/types'
 
-  const { post } = defineProps<{
-    post: Post
-  }>()
+const { post } = defineProps<{
+  post: Post
+}>()
 
-  import UserPreview from '../users/UserPreview.vue'
-  import PostImages from './PostImages.vue'
-  import PostFooter from './PostFooter.vue'
+import UserPreview from '../users/UserPreview.vue'
+import PostImages from './PostImages.vue'
+
 </script>
 
 <template>
-  <article class="w-full p-3 rounded-2xl bg-neutral-900" >
+  <article class="w-full p-3 rounded-2xl bg-neutral-900">
     <div class="flex justify-between items-center w-full">
-      <UserPreview :user="post.user"/>
+      <UserPreview :user="post.user" />
       <div class="hidden md:block">
         <p> {{ formatDate(toDate(post.created_at)) }} </p>
       </div>
     </div>
-    <div class="mt-3 text-lg">
+    <h3 class="mt-3 text-lg">
       {{ post.text_content }}
-    </div>
+    </h3>
     <div v-if="post.image_count > 0" class="pt-3">
-      <PostImages :id="post.id" :imageCount="post.image_count"/>
+      <PostImages :id="post.id" :imageCount="post.image_count" />
     </div>
-    <div>
-      <PostFooter :id="post.id"/>
-    </div>
+    <slot />
   </article>
 </template>

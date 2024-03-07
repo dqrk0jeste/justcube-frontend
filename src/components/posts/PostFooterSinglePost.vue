@@ -1,11 +1,133 @@
 <script setup lang="ts">
+import { ref, type Ref } from 'vue'
+import { ofetch } from 'ofetch'
+import { useRoute, useRouter } from 'vue-router'
 
-import PostComment from './PostComment.vue'
+import { API, createAuthHeader } from '@/utils/api'
+import { useCurrentUser } from '@/composables/useCurrentUser'
 
-const { id } = defineProps<{
-  id: string,
-}>()
+import type { Post as PostType, PostComment as PostCommentType, User } from '@/utils/types'
 
+const { id } = defineProps<{ id: string }>()
+
+
+const DEFAULT_PAGE_SIZE = 10
+const MAX_COMMENT_LENGTH = 200
+
+const currentUser = useCurrentUser()
+
+const comments = ref<PostCommentType[]>([])
+
+const { error: getCommentsError, isFetching: isFetchingComments, hasMoreComments, fetchMore } = useComments()
+
+const { comment, error: sendCommentError, isFetching: isSendingComment, sendComment } = useSendComment()
+
+type useCommentsReturn = {
+  error: Ref<any>,
+  isFetching: Ref<boolean>,
+  hasMoreComments: Ref<boolean>,
+  fetchMore: () => void,
+}
+
+function useComments(): useCommentsReturn {
+  const error = ref<any>(null)
+  const isFetching = ref<boolean>(false)
+  const hasMoreComments = ref<boolean>(true)
+
+  let pageNumber = 1
+
+  async function _fetchComments() {
+    try {
+      isFetching.value = true
+      const newComments = await ofetch<PostCommentType[]>(API + '/posts/comments', {
+        query: {
+          post_id: id,
+          page_number: pageNumber,
+          page_size: DEFAULT_PAGE_SIZE,
+        },
+      })
+
+      if (newComments.length < DEFAULT_PAGE_SIZE) {
+        hasMoreComments.value = false
+      }
+
+      error.value = null
+      comments.value.push(...newComments)
+      pageNumber++
+    } catch (e) {
+      error.value = e
+    } finally {
+      isFetching.value = false
+    }
+  }
+
+  _fetchComments()
+
+  return {
+    error,
+    isFetching,
+    hasMoreComments,
+    fetchMore: _fetchComments,
+  }
+}
+
+type useSendCommentReturn = {
+  comment: Ref<string>,
+  error: Ref<any>,
+  isFetching: Ref<boolean>,
+  sendComment: () => void,
+}
+
+function useSendComment(): useSendCommentReturn {
+  const comment = ref<string>('')
+  const error = ref<any>(null)
+  const isFetching = ref<boolean>(false)
+
+  async function sendComment() {
+    try {
+      isFetching.value = true
+      const data = await ofetch<PostCommentType>(API + '/posts/comments', {
+        method: 'POST',
+        body: {
+          content: comment.value,
+          post_id: id,
+        },
+        headers: {
+          authorization: createAuthHeader(currentUser.value.accessToken as string)
+        }
+      })
+      const newComment = {
+        id: data.id,
+        content: data.content,
+        user: currentUser.value.userInfo as User,
+        number_of_replies: 0,
+        created_at: data.created_at,
+      }
+      comments.value = [newComment, ...comments.value]
+      comment.value = ''
+    } catch (e) {
+      error.value = e
+      setTimeout(() => {
+        error.value = null
+      }, 3000)
+    } finally {
+      isFetching.value = false
+    }
+  }
+
+  return {
+    comment,
+    error,
+    isFetching,
+    sendComment,
+  }
+}
+
+function checkForEnter(e: KeyboardEvent) {
+  if (e.key !== 'Enter' || comment.value.length < 1) return;
+  sendComment()
+}
+  
 // TODO: when chats are added this thing should improve 
 function sharePost() {
   navigator.clipboard.writeText(location.origin + '/posts/' + id)
@@ -14,8 +136,8 @@ function sharePost() {
 </script>
 
 <template>
-  <div class="pt-3 flex justify-end gap-3">
-    <input
+  <!-- <div class="pt-3 flex justify-end gap-3"> -->
+    <!-- <input
       v-if="commentsOpened"
       v-model="comment"
       @keypress="checkForEnter"
@@ -55,7 +177,7 @@ function sharePost() {
         <PostComment :comment="comment" />
       </article>
     </div>
-  </div>
+  </div> -->
 
   <!-- <div v-show="commentsOpened" class="px-3 pt-3">
 

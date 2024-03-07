@@ -9,24 +9,23 @@
 </script>
 
 <template>
-  
-  <RouterLink
-    :to="`/users/${ comment.user.id }`"
-    class="inline mr-2 text-md text-white font-bold cursor-pointer hover:underline"
-  >
-    {{ comment.user.username }}
-  </RouterLink>
+  <p>
+    <RouterLink
+      :to="`/users/${ comment.user.id }`"
+      class="mr-1 text-md text-white font-bold cursor-pointer hover:underline"
+    >
+      {{ comment.user.username }}
+    </RouterLink>
 
-  <p class="inline line-height-3">
     {{ comment.content }}
+
     <span class="text-sm text-gray-400">
       {{ timeSince(toDate(comment.created_at)) }}
     </span>
+    <!-- TODO: this should probably change -->
+    <span class="ml-1 text-gray-400">&middot;</span>
+    <button class="text-gray-400 ml-1 text-sm hover:underline underline-offset-2">reply</button>
   </p>
 
-  <span class="ml-1 text-white">&middot;</span>
-  <button class="text-gray-400 ml-1 text-sm hover:underline underline-offset-2">reply</button>
-
   <CommentReplies v-if="comment.number_of_replies > 0" :id="comment.id" />
-
 </template>

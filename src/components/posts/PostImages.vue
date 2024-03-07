@@ -32,21 +32,21 @@
           <img :src="`https://letscube.s3.eu-north-1.amazonaws.com/${ id }_${ i - 1 }.jpg`" alt="">
         </div>
       </SwiperSlide>
-      <div class="swiper-button-next"></div>
-      <div class="swiper-button-prev"></div>
+      <div class="swiper-button-next hover:scale-110 transition-all"></div>
+      <div class="swiper-button-prev hover:scale-110 transition-all"></div>
     </SwiperComp>
   </div>
 </template>
 
 <style>
   :root {
-    --swiper-navigation-size: 32px;
+    --swiper-navigation-size: 2rem;
   }
 
   .swiper-button-next:after, 
   .swiper-button-prev:after {
     color: white;
-    padding: 10px;
+    padding: 2rem 1rem;
   }
 
   .swiper-button-disabled {

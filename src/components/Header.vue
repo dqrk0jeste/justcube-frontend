@@ -1,11 +1,9 @@
 <script setup lang="ts">
-  import { storeToRefs } from 'pinia'
   import { computed } from 'vue'
   
-  import { useSessionStore } from '@/stores/session'
+  import { useCurrentUser } from '@/composables/useCurrentUser';
 
-  const sessionStore = useSessionStore()
-  const { user: currentUser } = storeToRefs(sessionStore)
+  const currentUser = useCurrentUser()
 
   const username = computed(() => currentUser.value.isGuest ? 'login' : currentUser.value.userInfo?.username)
   const profileImage = computed(() => currentUser.value.isGuest ? 'https://placehold.co/40' : `https://placehold.co/40`)

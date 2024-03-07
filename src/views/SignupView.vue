@@ -8,8 +8,7 @@
   
   import type { User } from '@/utils/types'
 
-  const title = useTitle()
-  title.value = `let's cube | signup`
+  // TODO: this page needs cleanup
 
   const router = useRouter()
 
@@ -49,19 +48,34 @@
 
       <div>
         <label for="username" class="hidden">username</label>
-        <input v-model="username" type="text" id="username" placeholder="username" class="outline-none rounded-full text-lg text-black px-5 py-3 w-full" required maxlength="20">
+        <input
+          v-model="username"
+          type="text"
+          id="username"
+          placeholder="username"
+          class="outline-none rounded-full text-lg text-black px-5 py-3 w-full"
+          required
+          maxlength="20"
+        >
       </div>
 
       <div class="mt-5">
         <label for="password" class="hidden">password</label>
-        <input v-model="password" type="password" id="password" placeholder="password" class="outline-none rounded-full text-lg text-black px-5 py-3 w-full" required>
-        <div class="w-full flex justify-center">
-          
-        </div>
+        <input
+          v-model="password"
+          type="password"
+          id="password"
+          placeholder="password"
+          class="outline-none rounded-full text-lg text-black px-5 py-3 w-full"
+          required
+        >
       </div>
 
-      <button type="submit" class="bg-blue-200 w-full h-[52px] mt-7 rounded-full text-lg font-bold hover:bg-blue-300 transition-color" >
-        <i v-if="signupPending" class='bx bx-loader-circle bx-spin text-2xl text-black'></i>
+      <button
+        type="submit"
+        class="bg-blue-200 w-full h-[52px] mt-7 rounded-full text-lg font-bold hover:bg-blue-300 transition-color"
+      >
+        <box-icon v-if="signupPending" name="loader-circle" animation="spin"></box-icon>
         <span v-else class="text-black">create account</span>
       </button>
 

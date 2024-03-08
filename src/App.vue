@@ -5,26 +5,20 @@
 </script>
 
 <template>
-  <div class="max-w-[var(--max-width)] m-auto">
-    <DefaultLayout>
-      <RouterView v-slot="{ Component }">
-        <template v-if="Component">
-          <Suspense>
-            <!-- <KeepAlive> -->
-              <component :is="Component" />
-            <!-- </KeepAlive> -->
-            <template #fallback>
-              <div class="h-full text-4xl grid place-items-center">
-                Loading...
-              </div>
-            </template>
-          </Suspense>
-        </template>
-      </RouterView>
-    </DefaultLayout>
-  </div>
-  
+  <DefaultLayout>
+    <RouterView v-slot="{ Component }">
+      <template v-if="Component">
+        <Suspense>
+          <KeepAlive>
+            <component :is="Component" />
+          </KeepAlive>
+          <template #fallback>
+            <div class="h-full text-4xl grid place-items-center">
+              Loading...
+            </div>
+          </template>
+        </Suspense>
+      </template>
+    </RouterView>
+  </DefaultLayout>
 </template>
-
-<style scoped>
-</style>

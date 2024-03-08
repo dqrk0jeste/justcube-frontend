@@ -8,6 +8,8 @@ import { useCurrentUser } from '@/composables/useCurrentUser'
 
 import type { Post as PostType, PostComment as PostCommentType, User } from '@/utils/types'
 
+import PostComment from './PostComment.vue'
+
 const { id } = defineProps<{ id: string }>()
 
 
@@ -136,8 +138,8 @@ function sharePost() {
 </script>
 
 <template>
-  <!-- <div class="pt-3 flex justify-end gap-3"> -->
-    <!-- <input
+  <!-- <div class="pt-3 flex justify-end gap-3">
+    <input
       v-if="commentsOpened"
       v-model="comment"
       @keypress="checkForEnter"
@@ -170,14 +172,14 @@ function sharePost() {
       <box-icon v-if="commentsOpened" name="x" color="black" size="md"></box-icon>
       <box-icon v-else name="message-square-dots" color="white"></box-icon>
     </button>
-  </div>
-  <div v-show="commentsOpened">
+  </div> --->
+  <div>
     <div class="space-y-1">
       <article v-for="comment in comments" :key="comment.id">
         <PostComment :comment="comment" />
       </article>
     </div>
-  </div> -->
+  </div>
 
   <!-- <div v-show="commentsOpened" class="px-3 pt-3">
 

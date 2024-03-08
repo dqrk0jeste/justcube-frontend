@@ -9,7 +9,7 @@ import type { Post as PostType } from '@/utils/types'
 import Post from '@/components/posts/Post.vue'
 import PostFooterSinglePost from '@/components/posts/PostFooterSinglePost.vue'
 
-const id = usePostId()
+const id = getPostId()
 const post = await getPost()
 
 async function getPost() {
@@ -31,7 +31,7 @@ async function getPost() {
   }
 }
 
-function usePostId(): string {
+function getPostId(): string {
   return useRoute().params.id as string
 }
 
@@ -39,8 +39,10 @@ function usePostId(): string {
 
 <template>
   <template v-if="post">
-    <Post :post="post">
-      <PostFooterSinglePost :id="id" />
-    </Post>
+    <div class="h-full overflow-y-auto">
+      <Post :post="post">
+        <PostFooterSinglePost :id="id" />
+      </Post>
+    </div>
   </template>
 </template>

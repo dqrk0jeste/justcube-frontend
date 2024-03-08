@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <aside class="hidden lg:block w-[var(--sidetab-width)]">
+  <aside class="hidden lg:block">
     <Search />
   </aside>
 </template>

@@ -93,7 +93,7 @@
 </script>
 
 <template>
-  <div class="this space-y-3 md:space-y-5 h-full overflow-y-auto px-3">
+  <div class="space-y-3 md:space-y-5">
     <div v-for="post in posts" :key="post.id">
       <Post :post="post">
         <PostFooterFeed :id="post.id" />  
@@ -108,21 +108,3 @@
     <button @click="fetchMore()">click</button>
   </div>
 </template>
-
-<style scoped>
- .this::-webkit-scrollbar {
-    width: 5px;
-  }
-
-  .this::-webkit-scrollbar-track {
-    background-color: transparent;
-    margin-top: 10px;
-    margin-bottom: 10px;
-  }
-
-  .this::-webkit-scrollbar-thumb {
-    background-color: gray;
-    border-radius: 5px;
-  }
-  
-</style>

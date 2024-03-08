@@ -5,14 +5,18 @@
 </script>
 
 <template>
-  <div class="w-full h-[100dvh]">
+  <div class="max-w-[--max-width] m-auto">
     <Header />
-    <div class="h-[calc(100dvh-var(--header-height)-3px)] md:h-[calc(100dvh-var(--header-height)-12px)] flex mx-1 md:mx-3 gap-2 md:gap-3">
-      <Nav />
-      <main class="flex-1 overflow-hidden h-full">
+    <div class="mt-[--header-height] w-full grid grid-cols-12 gap-3 px-3">
+      <div class="col-span-2 h-fit sticky top-[--header-height]">
+        <Nav />
+      </div>
+      <main class="col-span-8">
         <slot />
       </main>
-      <SideTab />
+      <div class="col-span-2 h-fit sticky top-[--header-height]">
+        <SideTab />
+      </div>
     </div>
   </div>
 </template>

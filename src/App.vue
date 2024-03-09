@@ -9,11 +9,11 @@
     <RouterView v-slot="{ Component }">
       <template v-if="Component">
         <Suspense>
-          <KeepAlive>
+          <KeepAlive exclude="UserProfileView,PostView">
             <component :is="Component" />
           </KeepAlive>
           <template #fallback>
-            <div class="h-full text-4xl grid place-items-center">
+            <div class="h-[100dvh-var(--header-height)] text-4xl grid place-items-center">
               Loading...
             </div>
           </template>

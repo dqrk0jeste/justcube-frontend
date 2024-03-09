@@ -1,15 +1,16 @@
 <script setup lang="ts">
   import Header from '@/components/Header.vue'
   import SideTab from '@/components/SideTab.vue'
-  import Nav from '@/components/Nav.vue'
+  import DesktopNav from '@/components/DesktopNav.vue'
+  import MobileNav from '@/components/MobileNav.vue'
 </script>
 
 <template>
   <div class="max-w-[--max-width] m-auto">
     <Header />
-    <div class="mt-[--header-height] w-full grid grid-cols-12 gap-3 px-3">
+    <div class="mt-[--header-height] mb-[--nav-height-mobile] lg:mb-0 w-full lg:grid lg:grid-cols-12 lg:gap-3 px-3">
       <div class="col-span-2 h-fit sticky top-[--header-height]">
-        <Nav />
+        <DesktopNav />
       </div>
       <main class="col-span-8">
         <slot />
@@ -18,5 +19,6 @@
         <SideTab />
       </div>
     </div>
+    <MobileNav />
   </div>
 </template>

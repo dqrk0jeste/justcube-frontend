@@ -6,9 +6,7 @@
 
 :root {
   --max-width: 1600px;
-  --nav-width-desktop: 235px;
-  --nav-width-mobile: 50px;
-  --sidetab-width: 235px;
+  --nav-height-mobile: 64px;
   --header-height: 64px;
 }
 

@@ -158,7 +158,6 @@ function sharePost() {
   <p v-if="comments.length === 0" class="pl-3 pt-3">no comments yet. be the first one to comment</p>
 
   <div class="flex gap-3 items-center pt-2">
-    
     <input
       v-model="comment"
       @keypress="checkForEnter"

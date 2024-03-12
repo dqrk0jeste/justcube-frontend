@@ -1,5 +1,6 @@
 import { ref, type Ref } from 'vue'
 import { ofetch } from 'ofetch'
+import { until } from '@vueuse/core'
 
 type UseFetchReturn<T> = {
   data: Ref<T | undefined>,
@@ -10,7 +11,6 @@ type UseFetchReturn<T> = {
 
 type UseFetchError = {
   error: any,
-  failedToFetch: boolean,
   statusCode?: number,
 }
 
@@ -19,7 +19,7 @@ interface UseFetchOptions<T> extends RequestInit {
   onError?: (error: UseFetchError) => void,
 }
 
-export default function useFetch<T>(url: string, options?: UseFetchOptions<T>): UseFetchReturn<T> {
+export default function useFetch<T>(url: string, options?: UseFetchOptions<T>): UseFetchReturn<T> & PromiseLike<UseFetchReturn<T>> {
   const data = ref<T>()
   const error = ref<UseFetchError>()
   const pending = ref<boolean>(true)
@@ -34,8 +34,6 @@ export default function useFetch<T>(url: string, options?: UseFetchOptions<T>): 
         if(!res.ok) {
           error.value = {
             error: new Error('bad status code'),
-            failedToFetch: false,
-            badStatusCode: true,
             statusCode: res.status,
           }
           if(options?.onError) {
@@ -57,8 +55,6 @@ export default function useFetch<T>(url: string, options?: UseFetchOptions<T>): 
       .catch((e) => {
         error.value = {
           error: e,
-          failedToFetch: true,
-          badStatusCode: false,
         }
         if(options?.onError) {
           options.onError(error.value)
@@ -71,5 +67,12 @@ export default function useFetch<T>(url: string, options?: UseFetchOptions<T>): 
 
   _fetch()
 
-  return { data, error, pending, refresh: _fetch }
+  return { data,
+    error,
+    pending,
+    refresh: _fetch,
+    then: function(resolve, reject) {
+      until(pending).toBe(false).then(resolve, reject)
+    }
+  }
 }

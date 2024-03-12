@@ -10,7 +10,7 @@ import type { Post as PostType, PostComment as PostCommentType, User } from '@/u
 
 import PostComment from './PostComment.vue'
 
-const DEFAULT_PAGE_SIZE = 5
+const PAGE_SIZE = 5
 const MAX_COMMENT_LENGTH = 200
 
 const { id } = defineProps<{ id: string }>()
@@ -44,11 +44,11 @@ function useComments(): useCommentsReturn {
         query: {
           post_id: id,
           page_number: pageNumber,
-          page_size: DEFAULT_PAGE_SIZE,
+          page_size: PAGE_SIZE,
         },
       })
 
-      if (newComments.length < DEFAULT_PAGE_SIZE) {
+      if (newComments.length < PAGE_SIZE) {
         hasMoreComments.value = false
       }
 
@@ -147,7 +147,7 @@ function sharePost() {
       </article>
     </div>
     <p v-if="hasMoreComments && !isFetchingComments && !getCommentsError" @click="fetchMore()"
-      class="ml-3 text-blue-200 cursor-pointer hover:underline underline-offset-2">
+      class=" text-blue-200 cursor-pointer hover:underline underline-offset-2">
       see more...
     </p>
     <div v-else-if="isFetchingComments" class="pl-3 h-6">
@@ -157,7 +157,7 @@ function sharePost() {
   <p v-if="getCommentsError" class="text-red-500 pl-3">there has been an error, please try again</p>
   <p v-if="comments.length === 0" class="pl-3 pt-3">no comments yet. be the first one to comment</p>
 
-  <div class="flex gap-3 items-center pt-2">
+  <div class="pt-2 border-b border-white flex has-[:focus]:border-blue-300 transition-all">
     <input
       v-model="comment"
       @keypress="checkForEnter"
@@ -165,14 +165,15 @@ function sharePost() {
       type="text"
       :maxlength="MAX_COMMENT_LENGTH"
       :disabled="currentUser.isGuest"
-      class="flex-1 outline-none rounded-full text-black px-5 py-3 min-w-0"
+      class="min-w-0 w-full bg-transparent outline-none px-2 text-lg"
     >
+    <!-- flex items-center gap-2 w-[50px] justify-center aspect-square bg-white/10 rounded-full hover:bg-white/15 -->
     <button
       @click="sendComment()"
-      class="flex items-center gap-2 w-[50px] justify-center aspect-square bg-white/10 rounded-full hover:bg-white/15"
+      class="flex items-center justify-center p-2 hover:scale-110 transition-all"
       :disabled="currentUser.isGuest || isSendingComment || comment.length < 1"
     >
-      <box-icon v-if="isSendingComment" name="loader-circle"animation="spin" color="white"></box-icon>
+      <box-icon v-if="isSendingComment" name="loader-circle" animation="spin" color="white"></box-icon>
       <box-icon v-else name="navigation" color="white"></box-icon>
     </button>
   </div>

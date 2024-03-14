@@ -149,10 +149,16 @@ function checkForEnter(e: KeyboardEvent) {
       @click="repliesOpened = !repliesOpened"
       class="text-sm text-gray-400 ml-2 hover:underline underline-offset-2"
     > 
-      {{ internalNumberOfReplies ? 'show' : 'no' }} replies
+      {{ internalNumberOfReplies || 'no' }} replies
     </button>
   </div>
-  <div v-if="isReplying" class="ml-3 border-b border-white flex has-[:focus]:border-blue-300 transition-all">
+  <div v-if="isReplying" class="ml-3 border-b border-white flex items-center has-[:focus]:border-blue-300 transition-all">
+    <button
+      @click="isReplying = false"
+      class="flex items-center justify-center hover:scale-110"
+    >
+      <box-icon name="x" size="sm" color="white"></box-icon>
+    </button>
     <input
       v-model="reply"
       @keypress="checkForEnter"
@@ -170,5 +176,8 @@ function checkForEnter(e: KeyboardEvent) {
       <box-icon v-if="isSendingReply" name="loader-circle" animation="spin" color="white"></box-icon>
       <box-icon v-else name="navigation" color="white"></box-icon>
     </button>
+  </div>
+  <div v-if="repliesOpened">
+    darko
   </div>
 </template>

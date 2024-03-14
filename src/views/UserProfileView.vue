@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
 import { ofetch } from 'ofetch'
-import { until } from '@vueuse/core'
+import { until, useInfiniteScroll } from '@vueuse/core'
 import { useRoute, useRouter } from 'vue-router'
 
 import { API } from '@/utils/api'
@@ -12,29 +12,38 @@ import Post from '@/components/posts/Post.vue'
 import UserProfile from '@/components/users/UserProfile.vue'
 import PostFooterFeed from '@/components/posts/PostFooterFeed.vue'
 
-const DEFAULT_PAGE_SIZE = 10
+const PAGE_SIZE = 1
 
 const user = await getUser()
 
-const { posts, error, fetchMore } = await useFetchPosts()
+const { posts, error, fetchMore, hasMorePosts } = await useFetchPosts()
+
+const { isLoading } = useInfiniteScroll(document, fetchMore, {
+  distance: 50,
+  canLoadMore: () => hasMorePosts.value,
+})
+
 
 type useFetchPostsReturn = {
   posts: Ref<PostType[]>,
   error: Ref<any>,
   fetchMore: () => void,
+  hasMorePosts: Ref<boolean>,
 }
 
 function useFetchPosts(): PromiseLike<useFetchPostsReturn> {
   const posts = ref<PostType[]>([])
   const error = ref<any>(null)
   const isFetching = ref<boolean>(false)
+  const hasMorePosts = ref<boolean>(true)
 
   if (!user) {
     return new Promise<useFetchPostsReturn>((resolve) => {
       return resolve({
         posts,
         error,
-        fetchMore: () => { },
+        fetchMore: () => {},
+        hasMorePosts,
       })
     })
   }
@@ -48,9 +57,12 @@ function useFetchPosts(): PromiseLike<useFetchPostsReturn> {
         query: {
           user_id: user?.id,
           page_number: pageNumber,
-          page_size: DEFAULT_PAGE_SIZE,
+          page_size: PAGE_SIZE,
         },
       })
+      if(newPosts.length < PAGE_SIZE) {
+        hasMorePosts.value = false
+      }
       posts.value.push(...newPosts)
       error.value = null
       pageNumber++
@@ -70,11 +82,12 @@ function useFetchPosts(): PromiseLike<useFetchPostsReturn> {
       posts,
       error,
       fetchMore: _fetchPosts,
+      hasMorePosts,
     })
   })
 }
 
-async function getUser() {
+async function getUser(): Promise<User | null> {
   const route = useRoute()
   const router = useRouter()
   const userId = route.params.id
@@ -105,15 +118,16 @@ async function getUser() {
           <PostFooterFeed :id="post.id" />
         </Post>
       </div>
-      <!-- TODO: may need to change this when i implement infinite scroll -->
+      <div v-if="isLoading" class="w-full text-center">
+        <box-icon name="loader-circle" animation="spin" color="white"></box-icon>
+      </div>
+      <!-- TODO: may need to change this -->
       <div v-if="error" class="text-center py-10 text-xl">
         there has been an error.
         <button @click="fetchMore()" class="hover:underline underline-offset-2 text-blue-200">
           try again?
         </button>
       </div>
-      <!-- TODO: fix this -->
-      <button @click="fetchMore()">click</button>
     </div>
   </template>
 </template>

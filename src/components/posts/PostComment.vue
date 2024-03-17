@@ -20,9 +20,8 @@ const { comment } = defineProps<{ comment: PostComment }>()
     {{ comment.content }}
 
     <span class="text-sm text-gray-400">
-      {{ timeSince(toDate(comment.created_at)) }}
+      {{ timeSince(comment.created_at) }}
     </span>
   </p>
-<!-- v-if="comment.number_of_replies > 0" -->
   <CommentReplies :comment="comment" />
 </template>

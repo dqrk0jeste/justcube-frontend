@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
 import { ofetch } from 'ofetch'
-import { useRoute, useRouter } from 'vue-router'
 
 import { API, createAuthHeader } from '@/utils/api'
 import { useCurrentUser } from '@/composables/useCurrentUser'
 
-import type { Post as PostType, PostComment as PostCommentType, User } from '@/utils/types'
+import type { PostComment as PostCommentType, User } from '@/utils/types'
 
 import PostComment from './PostComment.vue'
 

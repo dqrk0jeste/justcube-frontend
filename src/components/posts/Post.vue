@@ -3,12 +3,13 @@ import { toDate, formatDate } from '@/utils/date'
 
 import type { Post } from '@/utils/types'
 
+import UserPreview from '../users/UserPreview.vue'
+import PostImages from './PostImages.vue'
+
 const { post } = defineProps<{
   post: Post
 }>()
 
-import UserPreview from '../users/UserPreview.vue'
-import PostImages from './PostImages.vue'
 
 </script>
 
@@ -17,7 +18,7 @@ import PostImages from './PostImages.vue'
     <div class="flex justify-between items-center w-full">
       <UserPreview :user="post.user" />
       <div class="hidden md:block">
-        <p> {{ formatDate(toDate(post.created_at)) }} </p>
+        <p> {{ formatDate(post.created_at) }} </p>
       </div>
     </div>
     <h3 class="mt-3 text-lg">

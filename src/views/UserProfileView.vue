@@ -15,14 +15,11 @@ import PostFooterFeed from '@/components/posts/PostFooterFeed.vue'
 const PAGE_SIZE = 1
 
 const user = await getUser()
-
 const { posts, error, fetchMore, hasMorePosts } = await useFetchPosts()
-
 const { isLoading } = useInfiniteScroll(document, fetchMore, {
   distance: 50,
   canLoadMore: () => hasMorePosts.value,
 })
-
 
 type useFetchPostsReturn = {
   posts: Ref<PostType[]>,

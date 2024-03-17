@@ -17,7 +17,10 @@ const months = [
   'december',
 ]
 
-export function formatDate(date: Date) : string {
+export function formatDate(date: Date | string) : string {
+  if(typeof date === 'string') {
+    date = toDate(date)
+  }
   return `${ months[date.getMonth()] } ${ date.getDate() }, ${ date.getFullYear() }`
 }
 
@@ -27,7 +30,11 @@ const DAY_IN_MILISECONDS = 24 * 60 * 60 * 1000
 const THIRTY_DAYS_IN_MILISECONDS = 30 * 24 * 60 * 60 * 1000
 const YEAR_IN_MILISECONDS = 365 * 24 * 60 * 60 * 1000
 
-export function timeSince(date: Date) : string {
+export function timeSince(date: Date | string) : string {
+  if(typeof date === 'string') {
+    date = toDate(date)
+  }
+
   if(Date.now() - date.getTime() < MINUTE_IN_MILISECONDS) {
     return `right now`
   }

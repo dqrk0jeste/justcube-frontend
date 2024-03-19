@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, type Ref } from 'vue'
+import { computed, ref, type Ref } from 'vue'
 import { ofetch } from 'ofetch'
 
 import { API, createAuthHeader } from '@/utils/api'
@@ -26,6 +26,19 @@ const replies = ref<CommentReply[]>([])
 const { error: getRepliesError, isFetching: isFetchingReplies, hasMoreReplies, fetchMore } = useReplies()
 
 const { reply, error: sendReplyError, isFetching: isSendingReply, sendReply } = useSendReply()
+
+const repliesButtonText = computed(() => {
+  if(internalNumberOfReplies.value === 0) {
+    return 'no replies'
+  }
+  if(repliesOpened.value) {
+    return 'hide replies'
+  }
+  if(internalNumberOfReplies.value === 1) {
+    return 'show reply'
+  }
+  return 'show replies'
+})
 
 type useRepliesReturn = {
   error: Ref<any>,
@@ -149,10 +162,10 @@ function checkForEnter(e: KeyboardEvent) {
       @click="repliesOpened = !repliesOpened"
       class="text-sm text-gray-400 ml-2 hover:underline underline-offset-2"
     > 
-      {{ internalNumberOfReplies || 'no' }} replies
+      {{ repliesButtonText }}
     </button>
   </div>
-  <div v-if="isReplying" class="ml-3 border-b border-white flex items-center has-[:focus]:border-blue-300 transition-all">
+  <div v-if="isReplying" class="ml-3 mb-2 border-b border-white flex items-center has-[:focus]:border-blue-300 transition-all">
     <button
       @click="isReplying = false"
       class="flex items-center justify-center hover:scale-110"
@@ -178,6 +191,37 @@ function checkForEnter(e: KeyboardEvent) {
     </button>
   </div>
   <div v-if="repliesOpened">
-    darko
+    <div class="space-y-1">
+      <article 
+        v-for="reply in replies"
+        :key="reply.id"
+        class="ml-3"
+      >
+        <p>
+          <RouterLink
+            :to="`/users/${ reply.user.id }`"
+            class="mr-1 text-md text-white font-bold cursor-pointer hover:underline"
+          >
+            {{ reply.user.username }}
+          </RouterLink>
+  
+          {{ reply.content }}
+  
+          <span class="text-sm text-gray-400">
+            {{ timeSince(reply.created_at) }}
+          </span>
+        </p>
+      </article>
+    </div>
+    <p
+      v-if="hasMoreReplies && !isFetchingReplies && !getRepliesError"
+      @click="fetchMore()"
+      class="ml-3 text-blue-200 cursor-pointer hover:underline underline-offset-2"
+    >
+      see more...
+    </p>
+    <div v-else-if="isFetchingReplies" class="pl-3 h-6">
+      <box-icon name="loader-circle" animation="spin" color="white"></box-icon>
+    </div>
   </div>
 </template>

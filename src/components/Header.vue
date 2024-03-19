@@ -12,7 +12,7 @@ const profileLink = computed(() => currentUser.value.isGuest ? '/login' : `/user
 </script>
 
 <template>
-  <header class="h-[var(--header-height)] fixed top-0 left-0 w-full z-50 bg-black">
+  <header class="h-[var(--header-height)] fixed top-0 left-0 w-full z-40 bg-black">
     <div class="max-w-[var(--max-width)] mx-auto px-1 md:px-3 h-full flex items-center gap-3">
       <RouterLink :to="profileLink">
         <img :src="profileImage" alt="profile-image"

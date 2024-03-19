@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <aside class="hidden lg:block">
+  <aside>
     <Search />
   </aside>
 </template>

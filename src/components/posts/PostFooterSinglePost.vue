@@ -139,44 +139,45 @@ function sharePost() {
 </script>
 
 <template>
-  <div v-if="comments.length > 0" class="pt-3 pl-3">
-    <div class="space-y-1">
-      <article v-for="comment in comments" :key="comment.id">
-        <PostComment :comment="comment" />
-      </article>
+  <div class="border-t border-white mt-3">
+    <div v-if="comments.length > 0" class="pt-3 pl-3">
+      <div class="space-y-1 divide-y divide-gray-500">
+        <article v-for="comment in comments" :key="comment.id">
+          <PostComment :comment="comment" />
+        </article>
+      </div>
+      <p v-if="hasMoreComments && !isFetchingComments && !getCommentsError" @click="fetchMore()"
+        class=" text-blue-200 cursor-pointer hover:underline underline-offset-2">
+        see more...
+      </p>
+      <div v-else-if="isFetchingComments" class="pl-3 h-6">
+        <box-icon name="loader-circle" animation="spin" color="white"></box-icon>
+      </div>
     </div>
-    <p v-if="hasMoreComments && !isFetchingComments && !getCommentsError" @click="fetchMore()"
-      class=" text-blue-200 cursor-pointer hover:underline underline-offset-2">
-      see more...
-    </p>
-    <div v-else-if="isFetchingComments" class="pl-3 h-6">
-      <box-icon name="loader-circle" animation="spin" color="white"></box-icon>
-    </div>
-  </div>
-  <p v-if="getCommentsError" class="text-red-500 pl-3">there has been an error, please try again</p>
-  <p v-if="comments.length === 0" class="pl-3 pt-3">no comments yet. be the first one to comment</p>
+    <p v-if="getCommentsError" class="text-red-500 pl-3">there has been an error, please try again</p>
+    <p v-if="comments.length === 0" class="pl-3 pt-3">no comments yet. be the first one to comment</p>
 
-  <div class="pt-2 border-b border-white flex has-[:focus]:border-blue-300 transition-all">
-    <input
-      v-model="comment"
-      @keypress="checkForEnter"
-      :placeholder="currentUser.isGuest ? 'please login to comment' : 'leave a comment...'"
-      type="text"
-      :maxlength="MAX_COMMENT_LENGTH"
-      :disabled="currentUser.isGuest"
-      class="min-w-0 w-full bg-transparent outline-none px-2 text-lg"
-    >
-    <!-- flex items-center gap-2 w-[50px] justify-center aspect-square bg-white/10 rounded-full hover:bg-white/15 -->
-    <button
-      @click="sendComment()"
-      class="flex items-center justify-center p-2 hover:scale-110 transition-all"
-      :disabled="currentUser.isGuest || isSendingComment || comment.length < 1"
-    >
-      <box-icon v-if="isSendingComment" name="loader-circle" animation="spin" color="white"></box-icon>
-      <box-icon v-else name="navigation" color="white"></box-icon>
-    </button>
+    <div class="pt-2 border-b border-white flex has-[:focus]:border-blue-300 transition-all">
+      <input
+        v-model="comment"
+        @keypress="checkForEnter"
+        :placeholder="currentUser.isGuest ? 'please login to comment' : 'leave a comment...'"
+        type="text"
+        :maxlength="MAX_COMMENT_LENGTH"
+        :disabled="currentUser.isGuest"
+        class="min-w-0 w-full bg-transparent outline-none px-2 text-lg"
+      >
+      <button
+        @click="sendComment()"
+        class="flex items-center justify-center p-2 hover:scale-110 transition-all"
+        :disabled="currentUser.isGuest || isSendingComment || comment.length < 1"
+      >
+        <box-icon v-if="isSendingComment" name="loader-circle" animation="spin" color="white"></box-icon>
+        <box-icon v-else name="navigation" color="white"></box-icon>
+      </button>
+    </div>
+    <p v-if="sendCommentError" class="ml-3 text-red-500">
+      there has been an error, please try again
+    </p>
   </div>
-  <p v-if="sendCommentError" class="ml-3 text-red-500">
-    there has been an error, please try again
-  </p>
 </template>

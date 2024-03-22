@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { Messages } from '@/utils/toast'
-
 import Header from '@/components/Header.vue'
 import SideTab from '@/components/SideTab.vue'
 import DesktopNav from '@/components/DesktopNav.vue'
@@ -10,7 +8,7 @@ import Toast from '@/components/Toast.vue'
 
 <template>
   <div class="max-w-[--max-width] m-auto">
-    <Toast :typeOfMessage="Messages.ERROR"/>
+    <Toast />
     <Header />
     <div class="mt-[--header-height] mb-[--nav-height-mobile] lg:mb-0 w-full lg:grid lg:grid-cols-12 lg:gap-3 px-3">
       <div class="hidden lg:block col-span-2 h-fit sticky top-[--header-height]">
@@ -19,10 +17,10 @@ import Toast from '@/components/Toast.vue'
       <main class="col-span-8">
         <slot />
       </main>
-      <div class="col-span-2 h-fit sticky top-[--header-height]">
+      <div class="hidden lg:block col-span-2 h-fit sticky top-[--header-height]">
         <SideTab />
       </div>
     </div>
     <MobileNav />
   </div>
-</template>
+</template>@/composables/toast@/composables/useToast

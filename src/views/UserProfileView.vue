@@ -28,7 +28,7 @@ type useFetchPostsReturn = {
   hasMorePosts: Ref<boolean>,
 }
 
-function useFetchPosts(): PromiseLike<useFetchPostsReturn> {
+async function useFetchPosts(): Promise<useFetchPostsReturn> {
   const posts = ref<PostType[]>([])
   const error = ref<any>(null)
   const isFetching = ref<boolean>(false)
@@ -71,17 +71,14 @@ function useFetchPosts(): PromiseLike<useFetchPostsReturn> {
     }
   }
 
-  _fetchPosts()
+  await _fetchPosts()
 
-  return new Promise<useFetchPostsReturn>(async (resolve) => {
-    await until(isFetching).toBe(false)
-    return resolve({
-      posts,
-      error,
-      fetchMore: _fetchPosts,
-      hasMorePosts,
-    })
-  })
+  return {
+    posts,
+    error,
+    fetchMore: _fetchPosts,
+    hasMorePosts,
+  }
 }
 
 async function getUser(): Promise<User | null> {

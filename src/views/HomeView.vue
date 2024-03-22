@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, watch, type Ref, } from 'vue'
 import { ofetch } from 'ofetch'
-import { until, useInfiniteScroll } from '@vueuse/core'
+import { until, useInfiniteScroll, whenever } from '@vueuse/core'
 
 import { useCurrentUser } from '@/composables/useCurrentUser'
+import { ERROR_MESSAGE, newToastNotification } from '@/composables/useToast'
 import { API, createAuthHeader } from '@/utils/api'
 
 import type { Post as PostType } from '@/utils/types'
@@ -18,7 +19,7 @@ const { posts, error, fetchMore, hasMorePosts } = await useFetchPosts()
 
 const { isLoading } = useInfiniteScroll(document, fetchMore, {
   distance: 50,
-  canLoadMore: () => hasMorePosts.value,
+  canLoadMore: () => hasMorePosts.value && !error.value,
 })
 
 type useFetchPostsReturn = {
@@ -28,7 +29,7 @@ type useFetchPostsReturn = {
   hasMorePosts: Ref<boolean>
 }
 
-function useFetchPosts(): PromiseLike<useFetchPostsReturn> {
+async function useFetchPosts(): Promise<useFetchPostsReturn> {
   const posts = ref<PostType[]>([])
   const error = ref<any>(null)
   const isFetching = ref<boolean>(false)
@@ -41,6 +42,8 @@ function useFetchPosts(): PromiseLike<useFetchPostsReturn> {
     pageNumber = 1
     _fetchPosts()
   })
+
+  whenever(error, () => newToastNotification(ERROR_MESSAGE))
   
   async function _fetchPosts() {
     isFetching.value = true
@@ -59,7 +62,6 @@ function useFetchPosts(): PromiseLike<useFetchPostsReturn> {
         error.value = null
         pageNumber++
       } catch(e) {
-        console.log(e)
         error.value = e
       }
     } else {
@@ -80,24 +82,20 @@ function useFetchPosts(): PromiseLike<useFetchPostsReturn> {
         error.value = null
         pageNumber++
       } catch(e) {
-        console.log(e)
         error.value = e
       }
     }
     isFetching.value = false
   }
 
-  _fetchPosts()
+  await _fetchPosts()
 
-  return new Promise<useFetchPostsReturn>(async (resolve) => {
-    await until(isFetching).toBe(false)
-    return resolve({
-      posts,
-      error,
-      fetchMore: _fetchPosts,
-      hasMorePosts,
-    })
-  })
+  return {
+    posts,
+    error,
+    fetchMore: _fetchPosts,
+    hasMorePosts,
+  }
 }
 </script>
 
@@ -111,13 +109,5 @@ function useFetchPosts(): PromiseLike<useFetchPostsReturn> {
     <div v-if="isLoading" class="w-full text-center">
       <box-icon name="loader-circle" animation="spin" color="white"></box-icon>
     </div>
-    <!-- This will change -->
-    <div v-if="error" class="text-center py-10 text-xl">
-      there has been an error.
-      <button @click="fetchMore()" class="hover:underline underline-offset-2 text-blue-200">
-        try again?
-      </button>
-    </div>
-    
   </div>
 </template>

@@ -7,6 +7,7 @@ import { useSessionStore } from '@/stores/session'
 import { API } from '@/utils/api'
 
 import type { User } from '@/utils/types'
+import { newToastNotification, welcomeMessage } from '@/composables/useToast'
 
 const router = useRouter()
 
@@ -44,6 +45,7 @@ function useLogin() {
       }
       // TODO: add auto refreshing of the access token using the refresh token
       router.push('/')
+      newToastNotification(welcomeMessage(data.user.username))
     } catch (e: any) {
       error.value = e
       setTimeout(() => {

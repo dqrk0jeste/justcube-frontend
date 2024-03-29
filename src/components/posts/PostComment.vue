@@ -1,11 +1,17 @@
 <script setup lang="ts">
-import { timeSince, toDate } from '@/utils/date'
+import { timeSince } from '@/utils/date'
 
 import type { PostComment } from '@/utils/types'
 
 import CommentReplies from './CommentReplies.vue'
 
-const { comment } = defineProps<{ comment: PostComment }>()
+const { comment } = defineProps<{
+  comment: PostComment
+}>()
+
+defineEmits<{
+  wantsToReply: [comment: PostComment],
+}>()
 </script>
 
 <template>
@@ -23,5 +29,5 @@ const { comment } = defineProps<{ comment: PostComment }>()
       {{ timeSince(comment.created_at) }}
     </span>
   </p>
-  <CommentReplies :comment="comment" />
+  <CommentReplies :comment="comment" @wantsToReply="(comment) => $emit('wantsToReply', comment)" />
 </template>

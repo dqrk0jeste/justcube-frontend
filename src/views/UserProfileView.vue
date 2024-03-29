@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
 import { ofetch } from 'ofetch'
-import { until, useInfiniteScroll } from '@vueuse/core'
+import { useInfiniteScroll } from '@vueuse/core'
 import { useRoute, useRouter } from 'vue-router'
 
-import { API } from '@/utils/api'
+import { ERROR_MESSAGE, newToastNotification } from '@/composables/useToast'
 
+import { API } from '@/utils/api'
 import type { Post as PostType, User } from '@/utils/types'
 
 import Post from '@/components/posts/Post.vue'
@@ -18,7 +19,7 @@ const user = await getUser()
 const { posts, error, fetchMore, hasMorePosts } = await useFetchPosts()
 const { isLoading } = useInfiniteScroll(document, fetchMore, {
   distance: 50,
-  canLoadMore: () => hasMorePosts.value,
+  canLoadMore: () => hasMorePosts.value && !error.value,
 })
 
 type useFetchPostsReturn = {
@@ -64,7 +65,7 @@ async function useFetchPosts(): Promise<useFetchPostsReturn> {
       error.value = null
       pageNumber++
     } catch (e) {
-      console.log(e)
+      newToastNotification(ERROR_MESSAGE)
       error.value = e
     } finally {
       isFetching.value = false
@@ -95,9 +96,7 @@ async function getUser(): Promise<User | null> {
       })
       return null
     }
-    router.replace({
-      name: '404',
-    })
+    newToastNotification(ERROR_MESSAGE)
     return null
   }
 }
@@ -105,7 +104,7 @@ async function getUser(): Promise<User | null> {
 
 <template>
   <template v-if="user">
-    <div class="this space-y-3 md:space-y-5 h-full overflow-y-auto px-3">
+    <div class="space-y-3 md:space-y-5 h-full overflow-y-auto px-3">
       <UserProfile :user="user" />
       <div v-for="post in posts" :key="post.id">
         <Post :post="post">
@@ -115,30 +114,6 @@ async function getUser(): Promise<User | null> {
       <div v-if="isLoading" class="w-full text-center">
         <box-icon name="loader-circle" animation="spin" color="white"></box-icon>
       </div>
-      <!-- TODO: may need to change this -->
-      <div v-if="error" class="text-center py-10 text-xl">
-        there has been an error.
-        <button @click="fetchMore()" class="hover:underline underline-offset-2 text-blue-200">
-          try again?
-        </button>
-      </div>
     </div>
   </template>
 </template>
-
-<style scoped>
-.this::-webkit-scrollbar {
-  width: 5px;
-}
-
-.this::-webkit-scrollbar-track {
-  background-color: transparent;
-  margin-top: 10px;
-  margin-bottom: 10px;
-}
-
-.this::-webkit-scrollbar-thumb {
-  background-color: gray;
-  border-radius: 5px;
-}
-</style>

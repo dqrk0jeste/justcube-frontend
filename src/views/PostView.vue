@@ -8,13 +8,14 @@ import type { Post as PostType } from '@/utils/types'
 
 import Post from '@/components/posts/Post.vue'
 import PostFooterSinglePost from '@/components/posts/PostFooterSinglePost.vue'
+import { ERROR_MESSAGE, newToastNotification } from '@/composables/useToast'
 
 const id = getPostId()
 const post = await getPost()
 
 async function getPost() {
   try {
-    const post = await ofetch<PostType>(API + `/posts/${id}`)
+    const post = await ofetch<PostType>(API + `/posts/${ id }`)
     return post
   } catch (e: any) {
     const router = useRouter()
@@ -24,9 +25,7 @@ async function getPost() {
       })
       return null
     }
-    router.replace({
-      name: '404',
-    })
+    newToastNotification(ERROR_MESSAGE)
     return null
   }
 }

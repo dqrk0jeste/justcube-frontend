@@ -43,7 +43,9 @@ async function useFetchPosts(): Promise<useFetchPostsReturn> {
     _fetchPosts()
   })
 
-  whenever(error, () => newToastNotification(ERROR_MESSAGE))
+  whenever(error, () => {
+    newToastNotification(ERROR_MESSAGE)
+  })
   
   async function _fetchPosts() {
     isFetching.value = true

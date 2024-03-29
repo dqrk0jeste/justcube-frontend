@@ -3,24 +3,28 @@ import { ref, type Ref } from 'vue'
 import { ofetch } from 'ofetch'
 
 import { API, createAuthHeader } from '@/utils/api'
+import { timeSince } from '@/utils/date'
 import { useCurrentUser } from '@/composables/useCurrentUser'
 
-import type { PostComment as PostCommentType, User } from '@/utils/types'
+import type { CommentReply, PostComment as PostCommentType, User } from '@/utils/types'
 
-import PostComment from './PostComment.vue'
+import CommentReplies from './PostComment.vue'
+import { ERROR_MESSAGE, newToastNotification } from '@/composables/useToast'
 
 const PAGE_SIZE = 5
 const MAX_COMMENT_LENGTH = 200
 
-const { id } = defineProps<{ id: string }>()
+const { id } = defineProps<{
+  id: string
+}>()
 
 const currentUser = useCurrentUser()
 
+const replyingTo = ref<PostCommentType | null>(null)
 const comments = ref<PostCommentType[]>([])
 
-const { error: getCommentsError, isFetching: isFetchingComments, hasMoreComments, fetchMore } = useComments()
-
-const { comment, error: sendCommentError, isFetching: isSendingComment, sendComment } = useSendComment()
+const { isFetching: isFetchingComments, hasMoreComments, fetchMore } = useComments()
+const { comment, isFetching: isSendingComment, sendAppropriate } = useSendComment()
 
 type useCommentsReturn = {
   error: Ref<any>,
@@ -56,9 +60,7 @@ function useComments(): useCommentsReturn {
       pageNumber++
     } catch (e) {
       error.value = e
-      setTimeout(() => {
-        error.value = null
-      }, 3000)
+      newToastNotification(ERROR_MESSAGE)
     } finally {
       isFetching.value = false
     }
@@ -78,13 +80,14 @@ type useSendCommentReturn = {
   comment: Ref<string>,
   error: Ref<any>,
   isFetching: Ref<boolean>,
-  sendComment: () => void,
+  sendAppropriate: () => void,
 }
 
 function useSendComment(): useSendCommentReturn {
   const comment = ref<string>('')
   const error = ref<any>(null)
   const isFetching = ref<boolean>(false)
+  const newReplyToAdd = ref<CommentReply>()
 
   async function sendComment() {
     try {
@@ -110,11 +113,46 @@ function useSendComment(): useSendCommentReturn {
       comment.value = ''
     } catch (e) {
       error.value = e
-      setTimeout(() => {
-        error.value = null
-      }, 3000)
+      newToastNotification(ERROR_MESSAGE)
     } finally {
       isFetching.value = false
+    }
+  }
+
+  async function sendReply() {
+    try {
+      isFetching.value = true
+      const data = await ofetch<PostCommentType>(API + '/posts/comments/replies', {
+        method: 'POST',
+        body: {
+          content: comment.value,
+          comment_id: replyingTo.value?.id,
+        },
+        headers: {
+          authorization: createAuthHeader(currentUser.value.accessToken as string)
+        }
+      })
+      const newReply = {
+        id: data.id,
+        content: data.content,
+        user: currentUser.value.userInfo as User,
+        created_at: data.created_at,
+      }
+      newReplyToAdd.value = newReply
+      comment.value = ''
+    } catch (e) {
+      error.value = e
+      newToastNotification(ERROR_MESSAGE)
+    } finally {
+      isFetching.value = false
+    }
+  }
+
+  function sendAppropriate() {
+    if(replyingTo) {
+      sendReply()
+    } else {
+      sendComment()
     }
   }
 
@@ -122,16 +160,19 @@ function useSendComment(): useSendCommentReturn {
     comment,
     error,
     isFetching,
-    sendComment,
+    sendAppropriate,
   }
 }
 
 function checkForEnter(e: KeyboardEvent) {
   if (e.key !== 'Enter' || comment.value.length < 1) return;
-  sendComment()
+  sendAppropriate()
 }
-  
-// TODO: when chats are added this thing should improve 
+
+function handleReplying(comment: PostCommentType) {
+  replyingTo.value = comment
+}
+
 function sharePost() {
   navigator.clipboard.writeText(location.origin + '/posts/' + id)
   console.log(location.origin + '/posts/' + id)
@@ -143,18 +184,33 @@ function sharePost() {
     <div v-if="comments.length > 0" class="pt-3 pl-3">
       <div class="space-y-1 divide-y divide-gray-500">
         <article v-for="comment in comments" :key="comment.id">
-          <PostComment :comment="comment" />
+          <p>
+            <RouterLink
+              :to="`/users/${ comment.user.id }`"
+              class="mr-1 text-md text-white font-bold cursor-pointer hover:underline"
+            >
+              {{ comment.user.username }}
+            </RouterLink>
+            <span>
+              {{ comment.content }}
+            </span>
+            <span class="text-sm text-gray-400">
+              {{ timeSince(comment.created_at) }}
+            </span>
+          </p>
+          <CommentReplies :comment="comment" @wantsToReply="handleReplying" />
         </article>
       </div>
-      <p v-if="hasMoreComments && !isFetchingComments && !getCommentsError" @click="fetchMore()"
-        class=" text-blue-200 cursor-pointer hover:underline underline-offset-2">
+      <p 
+        v-if="hasMoreComments && !isFetchingComments" @click="fetchMore"
+        class=" text-blue-200 cursor-pointer hover:underline underline-offset-2"
+      >
         see more...
       </p>
       <div v-else-if="isFetchingComments" class="pl-3 h-6">
         <box-icon name="loader-circle" animation="spin" color="white"></box-icon>
       </div>
     </div>
-    <p v-if="getCommentsError" class="text-red-500 pl-3">there has been an error, please try again</p>
     <p v-if="comments.length === 0" class="pl-3 pt-3">no comments yet. be the first one to comment</p>
 
     <div class="pt-2 border-b border-white flex has-[:focus]:border-blue-300 transition-all">
@@ -168,7 +224,7 @@ function sharePost() {
         class="min-w-0 w-full bg-transparent outline-none px-2 text-lg"
       >
       <button
-        @click="sendComment()"
+        @click="sendAppropriate"
         class="flex items-center justify-center p-2 hover:scale-110 transition-all"
         :disabled="currentUser.isGuest || isSendingComment || comment.length < 1"
       >
@@ -176,8 +232,5 @@ function sharePost() {
         <box-icon v-else name="navigation" color="white"></box-icon>
       </button>
     </div>
-    <p v-if="sendCommentError" class="ml-3 text-red-500">
-      there has been an error, please try again
-    </p>
   </div>
 </template>

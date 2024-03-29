@@ -3,7 +3,7 @@ import { computed, ref, type Ref } from 'vue'
 import { ofetch } from 'ofetch'
 
 import { API, createAuthHeader } from '@/utils/api'
-import { timeSince, toDate } from '@/utils/date'
+import { timeSince } from '@/utils/date'
 import { useCurrentUser } from '@/composables/useCurrentUser'
 
 import type { CommentReply, PostComment, PostComment as PostCommentType, User } from '@/utils/types'
@@ -13,6 +13,10 @@ const MAX_REPLY_LENGTH = 200
 
 const { comment } = defineProps<{
   comment: PostComment,
+}>()
+
+defineEmits<{
+  wantsToReply: [comment: PostComment],
 }>()
 
 const currentUser = useCurrentUser()
@@ -153,7 +157,7 @@ function checkForEnter(e: KeyboardEvent) {
 <template>
   <div>
     <button
-      @click="isReplying = true"
+      @click="$emit('wantsToReply', comment)"
       class="text-sm text-gray-400 ml-3 hover:underline underline-offset-2"
     >
       reply
@@ -165,7 +169,7 @@ function checkForEnter(e: KeyboardEvent) {
       {{ repliesButtonText }}
     </button>
   </div>
-  <div v-if="isReplying" class="ml-3 mb-2 border-b border-white flex items-center has-[:focus]:border-blue-300 transition-all">
+  <!-- <div v-if="isReplying" class="ml-3 mb-2 border-b border-white flex items-center has-[:focus]:border-blue-300 transition-all">
     <button
       @click="isReplying = false"
       class="flex items-center justify-center hover:scale-110"
@@ -182,14 +186,14 @@ function checkForEnter(e: KeyboardEvent) {
       class="min-w-0 w-full bg-transparent outline-none px-2"
     >
     <button
-      @click="sendReply()"
+      @click="sendReply"
       class="flex items-center justify-center p-2 hover:scale-110 transition-all"
       :disabled="currentUser.isGuest || isSendingReply || reply.length < 1"
     >
       <box-icon v-if="isSendingReply" name="loader-circle" animation="spin" color="white"></box-icon>
       <box-icon v-else name="navigation" color="white"></box-icon>
     </button>
-  </div>
+  </div> -->
   <div v-if="repliesOpened">
     <div class="space-y-1">
       <article 
@@ -214,7 +218,7 @@ function checkForEnter(e: KeyboardEvent) {
       </article>
     </div>
     <p
-      v-if="hasMoreReplies && !isFetchingReplies && !getRepliesError"
+      v-if="hasMoreReplies && !isFetchingReplies"
       @click="fetchMore()"
       class="ml-3 text-blue-200 cursor-pointer hover:underline underline-offset-2"
     >

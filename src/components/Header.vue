@@ -24,7 +24,7 @@ const profileLink = computed(() => currentUser.value.isGuest ? '/login' : `/user
         </span>
       </RouterLink>
       <div class="absolute left-1/2 -translate-x-1/2 flex items-center">
-        <h2 class="text-4xl whitespace-nowrap">let's cube</h2>
+        <h2 class="text-4xl whitespace-nowrap">just cube</h2>
       </div>
     </div>
   </header>

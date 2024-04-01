@@ -7,30 +7,36 @@ import { useRoute, useRouter } from 'vue-router'
 import { ERROR_MESSAGE, newToastNotification } from '@/composables/useToast'
 
 import { API } from '@/utils/api'
-import type { Post as PostType, User } from '@/utils/types'
+import type { Post, User } from '@/utils/types'
 
-import Post from '@/components/posts/Post.vue'
+import PostComp from '@/components/posts/Post.vue'
 import UserProfile from '@/components/users/UserProfile.vue'
 import PostFooterFeed from '@/components/posts/PostFooterFeed.vue'
 
-const PAGE_SIZE = 1
+const PAGE_SIZE = 10
 
 const user = await getUser()
-const { posts, error, fetchMore, hasMorePosts } = await useFetchPosts()
+const {
+  posts,
+  error,
+  fetchMore,
+  hasMorePosts
+} = await useFetchPosts()
+
 const { isLoading } = useInfiniteScroll(document, fetchMore, {
   distance: 50,
   canLoadMore: () => hasMorePosts.value && !error.value,
 })
 
 type useFetchPostsReturn = {
-  posts: Ref<PostType[]>,
+  posts: Ref<Post[]>,
   error: Ref<any>,
   fetchMore: () => void,
   hasMorePosts: Ref<boolean>,
 }
 
 async function useFetchPosts(): Promise<useFetchPostsReturn> {
-  const posts = ref<PostType[]>([])
+  const posts = ref<Post[]>([])
   const error = ref<any>(null)
   const isFetching = ref<boolean>(false)
   const hasMorePosts = ref<boolean>(true)
@@ -51,7 +57,7 @@ async function useFetchPosts(): Promise<useFetchPostsReturn> {
   async function _fetchPosts() {
     isFetching.value = true
     try {
-      const newPosts = await ofetch<PostType[]>(API + '/posts', {
+      const newPosts = await ofetch<Post[]>(API + '/posts', {
         query: {
           user_id: user?.id,
           page_number: pageNumber,
@@ -104,12 +110,12 @@ async function getUser(): Promise<User | null> {
 
 <template>
   <template v-if="user">
-    <div class="space-y-3 md:space-y-5 h-full overflow-y-auto px-3">
+    <div class="space-y-3 md:space-y-5 px-3">
       <UserProfile :user="user" />
       <div v-for="post in posts" :key="post.id">
-        <Post :post="post">
+        <PostComp :post="post">
           <PostFooterFeed :id="post.id" />
-        </Post>
+        </PostComp>
       </div>
       <div v-if="isLoading" class="w-full text-center">
         <box-icon name="loader-circle" animation="spin" color="white"></box-icon>

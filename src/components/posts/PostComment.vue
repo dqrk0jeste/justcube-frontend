@@ -3,14 +3,10 @@ import { timeSince } from '@/utils/date'
 
 import type { PostComment } from '@/utils/types'
 
-import CommentReplies from './CommentReplies.vue'
+import CommentFooter from './CommentFooter.vue'
 
 const { comment } = defineProps<{
   comment: PostComment
-}>()
-
-defineEmits<{
-  wantsToReply: [comment: PostComment],
 }>()
 </script>
 
@@ -22,12 +18,12 @@ defineEmits<{
     >
       {{ comment.user.username }}
     </RouterLink>
-
-    {{ comment.content }}
-
-    <span class="text-sm text-gray-400">
+    <span>
+      {{ comment.content }}
+    </span>
+    <span class="ml-1 text-sm text-gray-400">
       {{ timeSince(comment.created_at) }}
     </span>
   </p>
-  <CommentReplies :comment="comment" @wantsToReply="(comment) => $emit('wantsToReply', comment)" />
+  <CommentFooter :comment="comment" />
 </template>

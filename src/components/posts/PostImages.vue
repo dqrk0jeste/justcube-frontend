@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { Swiper as SwiperComp, SwiperSlide } from 'swiper/vue'
+  import { Swiper, SwiperSlide } from 'swiper/vue'
   import { Pagination, Zoom, Navigation } from 'swiper/modules'
 
   import 'swiper/css'
@@ -17,7 +17,7 @@
 
 <template>
   <div>
-    <SwiperComp
+    <Swiper
       class="rounded-lg relative"
       :modules="[Pagination, Zoom, Navigation]"
       :grab-cursor="true"
@@ -34,7 +34,7 @@
       </SwiperSlide>
       <div class="swiper-button-next hover:scale-110 transition-all"></div>
       <div class="swiper-button-prev hover:scale-110 transition-all"></div>
-    </SwiperComp>
+    </Swiper>
   </div>
 </template>
 

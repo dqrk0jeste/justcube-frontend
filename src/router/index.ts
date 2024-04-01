@@ -4,7 +4,7 @@ import { useTitle } from '@vueuse/core'
 
 function setTitle(title: string) {
   const titleRef = useTitle()
-  titleRef.value = `let's cube | ${ title }`
+  titleRef.value = `just cube | ${ title }`
 }
 
 const router = createRouter({

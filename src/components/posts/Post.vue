@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toDate, formatDate } from '@/utils/date'
+import { formatDate } from '@/utils/date'
 
 import type { Post } from '@/utils/types'
 
@@ -9,8 +9,6 @@ import PostImages from './PostImages.vue'
 const { post } = defineProps<{
   post: Post
 }>()
-
-
 </script>
 
 <template>

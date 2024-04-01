@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { computed, ref, type Ref } from 'vue'
+import { computed, inject, ref, type Ref } from 'vue'
 import { ofetch } from 'ofetch'
 
 import { API, createAuthHeader } from '@/utils/api'
-import { timeSince } from '@/utils/date'
 import { useCurrentUser } from '@/composables/useCurrentUser'
 
-import type { CommentReply, PostComment, PostComment as PostCommentType, User } from '@/utils/types'
+import type { CommentReply, PostComment, User } from '@/utils/types'
+
+import CommentReplyComp from './CommentReply.vue'
+import { newToastNotification } from '@/composables/useToast'
 
 const PAGE_SIZE = 5
 const MAX_REPLY_LENGTH = 200
@@ -16,35 +18,42 @@ const { comment } = defineProps<{
 }>()
 
 defineEmits<{
-  wantsToReply: [comment: PostComment],
+  wantsToReply: [],
 }>()
 
 const currentUser = useCurrentUser()
 
-const repliesOpened = ref<boolean>(false)
-const isReplying = ref<boolean>(false)
-const internalNumberOfReplies = ref<number>(comment.number_of_replies)
+const repliesOpened = ref(false)
+const hasReplies = ref(comment.number_of_replies === 0 ? false : true)
 
-const replies = ref<CommentReply[]>([])
+const currentInput = inject('input-holder') as Ref<string>
+const isReplying = computed(() => currentInput.value === comment.id)
 
-const { error: getRepliesError, isFetching: isFetchingReplies, hasMoreReplies, fetchMore } = useReplies()
+const {
+  replies,
+  isFetching: isFetchingReplies,
+  hasMoreReplies,
+  fetchMore,
+} = useReplies()
 
-const { reply, error: sendReplyError, isFetching: isSendingReply, sendReply } = useSendReply()
+const {
+  reply,
+  isFetching: isSendingReply,
+  sendReply,
+} = useSendReply()
 
 const repliesButtonText = computed(() => {
-  if(internalNumberOfReplies.value === 0) {
+  if(hasReplies.value === false) {
     return 'no replies'
   }
   if(repliesOpened.value) {
     return 'hide replies'
   }
-  if(internalNumberOfReplies.value === 1) {
-    return 'show reply'
-  }
   return 'show replies'
 })
 
 type useRepliesReturn = {
+  replies: Ref<CommentReply[]>,
   error: Ref<any>,
   isFetching: Ref<boolean>,
   hasMoreReplies: Ref<boolean>,
@@ -52,6 +61,7 @@ type useRepliesReturn = {
 }
 
 function useReplies(): useRepliesReturn {
+  const replies = ref<CommentReply[]>([])
   const error = ref<any>(null)
   const isFetching = ref<boolean>(false)
   const hasMoreReplies = ref<boolean>(true)
@@ -72,9 +82,10 @@ function useReplies(): useRepliesReturn {
       if (newReplies.length < PAGE_SIZE) {
         hasMoreReplies.value = false
       }
-
+      
+      const newRepliesFilltered = newReplies.filter((reply) => !alreadyHasId(reply.id))
       error.value = null
-      replies.value.push(...newReplies)
+      replies.value.push(...newRepliesFilltered)
       pageNumber++
     } catch (e) {
       error.value = e
@@ -89,6 +100,7 @@ function useReplies(): useRepliesReturn {
   _fetchReplies()
 
   return {
+    replies,
     error,
     isFetching,
     hasMoreReplies,
@@ -111,7 +123,7 @@ function useSendReply(): useSendReplyReturn {
   async function sendReply() {
     try {
       isFetching.value = true
-      const data = await ofetch<PostCommentType>(API + '/posts/comments/replies', {
+      const data = await ofetch<PostComment>(API + '/posts/comments/replies', {
         method: 'POST',
         body: {
           content: reply.value,
@@ -128,7 +140,7 @@ function useSendReply(): useSendReplyReturn {
         created_at: data.created_at,
       }
       replies.value.push(newReply)
-      internalNumberOfReplies.value++
+      hasReplies.value = true
       reply.value = ''
     } catch (e) {
       error.value = e
@@ -148,16 +160,37 @@ function useSendReply(): useSendReplyReturn {
   }
 }
 
+function handleReplying() {
+  if(currentUser.value.isGuest) {
+    newToastNotification({
+      heading: 'you are not logged in',
+      paragraph: 'please log in to reply'
+    })
+    return;
+  }
+  currentInput.value = comment.id
+  document.querySelector('.comment-input-area')?.scrollIntoView({ behavior: 'smooth' })
+}
+
 function checkForEnter(e: KeyboardEvent) {
   if (e.key !== 'Enter' || reply.value.length < 1) return;
   sendReply()
 }
+
+function alreadyHasId(id: string): boolean {
+  for(let i = 0; i < replies.value.length; i++) {
+    if(replies.value[i].id === id) {
+      return true
+    } 
+  }
+  return false
+} 
 </script>
 
 <template>
   <div>
     <button
-      @click="$emit('wantsToReply', comment)"
+      @click="handleReplying"
       class="text-sm text-gray-400 ml-3 hover:underline underline-offset-2"
     >
       reply
@@ -165,56 +198,14 @@ function checkForEnter(e: KeyboardEvent) {
     <button
       @click="repliesOpened = !repliesOpened"
       class="text-sm text-gray-400 ml-2 hover:underline underline-offset-2"
-    > 
+    >
       {{ repliesButtonText }}
     </button>
   </div>
-  <!-- <div v-if="isReplying" class="ml-3 mb-2 border-b border-white flex items-center has-[:focus]:border-blue-300 transition-all">
-    <button
-      @click="isReplying = false"
-      class="flex items-center justify-center hover:scale-110"
-    >
-      <box-icon name="x" size="sm" color="white"></box-icon>
-    </button>
-    <input
-      v-model="reply"
-      @keypress="checkForEnter"
-      :placeholder="currentUser.isGuest ? 'please login to reply' : `reply to ${ comment.user.username }`"
-      type="text"
-      :maxlength="MAX_REPLY_LENGTH"
-      :disabled="currentUser.isGuest"
-      class="min-w-0 w-full bg-transparent outline-none px-2"
-    >
-    <button
-      @click="sendReply"
-      class="flex items-center justify-center p-2 hover:scale-110 transition-all"
-      :disabled="currentUser.isGuest || isSendingReply || reply.length < 1"
-    >
-      <box-icon v-if="isSendingReply" name="loader-circle" animation="spin" color="white"></box-icon>
-      <box-icon v-else name="navigation" color="white"></box-icon>
-    </button>
-  </div> -->
   <div v-if="repliesOpened">
     <div class="space-y-1">
-      <article 
-        v-for="reply in replies"
-        :key="reply.id"
-        class="ml-3"
-      >
-        <p>
-          <RouterLink
-            :to="`/users/${ reply.user.id }`"
-            class="mr-1 text-md text-white font-bold cursor-pointer hover:underline"
-          >
-            {{ reply.user.username }}
-          </RouterLink>
-  
-          {{ reply.content }}
-  
-          <span class="text-sm text-gray-400">
-            {{ timeSince(reply.created_at) }}
-          </span>
-        </p>
+      <article v-for="reply in replies" :key="reply.id">
+        <CommentReplyComp :reply="reply"/>
       </article>
     </div>
     <p
@@ -228,4 +219,31 @@ function checkForEnter(e: KeyboardEvent) {
       <box-icon name="loader-circle" animation="spin" color="white"></box-icon>
     </div>
   </div>
+  <Teleport v-if="isReplying" to=".comment-input-area">
+    <div class="pt-2 border-b border-white flex has-[:focus]:border-blue-300 transition-all">
+      <button
+        @click="currentInput = 'base'"
+        class="flex items-center px-2 bg-white/5 rounded-full hover:bg-white/10 transition-colors"
+      >
+        <box-icon name="x" color="white"></box-icon>
+        <span>{{ comment.user.username }}</span>
+      </button>
+      <input
+        v-model="reply"
+        @keypress="checkForEnter"
+        placeholder="leave a reply..."
+        type="text"
+        :maxlength="MAX_REPLY_LENGTH"
+        class="min-w-0 w-full bg-transparent outline-none px-2 text-lg"
+      >
+      <button
+        @click="sendReply"
+        class="flex items-center justify-center p-2 hover:scale-110 transition-all"
+        :disabled="isSendingReply || reply.length < 1"
+      >
+        <box-icon v-if="isSendingReply" name="loader-circle" animation="spin" color="white"></box-icon>
+        <box-icon v-else name="navigation" color="white"></box-icon>
+      </button>
+    </div>
+  </Teleport>
 </template>

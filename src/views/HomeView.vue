@@ -12,6 +12,7 @@ import type { Post } from '@/utils/types'
 
 import PostComp from '@/components/posts/Post.vue'
 import PostFooterFeed from '@/components/posts/PostFooterFeed.vue'
+import UploadPost from '@/components/posts/UploadPost.vue'
 
 const PAGE_SIZE = 10
 
@@ -110,6 +111,7 @@ async function useFetchPosts(): Promise<useFetchPostsReturn> {
 
 <template>
   <div class="space-y-3 md:space-y-5">
+    <UploadPost />
     <div v-for="post in posts" :key="post.id">
       <PostComp :post="post">
         <PostFooterFeed :id="post.id" />  

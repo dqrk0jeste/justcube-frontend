@@ -50,7 +50,7 @@ const router = createRouter({
       component: () => import('@/views/UserProfileView.vue'),
       beforeEnter() {
         setTitle('user')
-      }
+      },
     },
     {
       path: '/:pathMatch(.*)*',

@@ -11,12 +11,17 @@ import { newToastNotification, welcomeMessage } from '@/composables/useToast'
 
 const router = useRouter()
 
-const username = ref<string>('')
-const password = ref<string>('')
-
-const { error, isFetching, loginUser } = useLogin()
+const {
+  password,
+  username,
+  error,
+  isFetching,
+  loginUser
+} = useLogin()
 
 function useLogin() {
+  const password = ref<string>('')
+  const username = ref<string>('')
   const isFetching = ref<boolean>(false)
   const error = ref<any>(null)
 
@@ -56,6 +61,8 @@ function useLogin() {
     }
   }
   return {
+    password,
+    username,
     error,
     isFetching,
     loginUser,
@@ -64,7 +71,7 @@ function useLogin() {
 </script>
 
 <template>
-  <div class="this h-full w-full overflow-y-auto grid place-items-center">
+  <div class="this w-full h-[calc(100dvh-var(--header-height))] grid place-items-center">
     <form @submit.prevent="loginUser()" class="max-w-[300px] w-full">
       <h1 class="text-3xl mb-5 text-center">welcome back</h1>
       <div>

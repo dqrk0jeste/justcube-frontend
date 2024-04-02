@@ -17,10 +17,6 @@ const { comment } = defineProps<{
   comment: PostComment,
 }>()
 
-defineEmits<{
-  wantsToReply: [],
-}>()
-
 const currentUser = useCurrentUser()
 
 const repliesOpened = ref(false)

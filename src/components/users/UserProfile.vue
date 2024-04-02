@@ -1,26 +1,31 @@
 <script setup lang="ts">
-import { API } from '@/utils/api'
-import type { User } from '@/utils/types'
 import { ofetch } from 'ofetch'
-import { ref } from 'vue'
+
+import { API } from '@/utils/api'
+
+import type { User } from '@/utils/types'
 
 const { user } = defineProps<{ user: User }>()
 
-const error = ref<any>(null)
+const { followersCount, followingCount} = await getCount()
 
-const [followersCount, followingCount] = await getCount()
-
-async function getCount(): Promise<[number, number]> {
+async function getCount() {
   try {
     const [{ followers_count }, { following_count }] = await Promise.all(
       [
-        ofetch<{ followers_count: number }>(API + `/users/followers/${user.id}`),
-        ofetch<{ following_count: number }>(API + `/users/following/${user.id}`)
+        ofetch<{ followers_count: number }>(API + `/users/followers/count/${user.id}`),
+        ofetch<{ following_count: number }>(API + `/users/following/count/${user.id}`)
       ]
     )
-    return [followers_count, following_count]
+    return {
+      followersCount: followers_count,
+      followingCount: following_count,
+    }
   } catch (e) {
-    return [0, 0]
+    return {
+      followersCount: 0,
+      followingCount: 0,
+    }
   }
 }
 </script>

@@ -23,4 +23,4 @@ import Toast from '@/components/Toast.vue'
     </div>
     <MobileNav />
   </div>
-</template>@/composables/toast@/composables/useToast
+</template>

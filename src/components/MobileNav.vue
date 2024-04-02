@@ -11,7 +11,7 @@
       <box-icon name="stopwatch" color="white" size="md"></box-icon>
     </RouterLink>
     <RouterLink to="/" class="rounded-full flex-1 bg-neutral-900 flex items-center justify-center">
-      <box-icon name="cube-alt" color="white" size="md"></box-icon>
+      <box-icon name="cube" color="white" size="md"></box-icon>
     </RouterLink>
     <RouterLink to="/" class="rounded-full flex-1 bg-neutral-900 flex items-center justify-center">
       <box-icon name="user" color="white" size="md"></box-icon>

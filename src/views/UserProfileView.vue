@@ -12,10 +12,12 @@ import type { Post, User } from '@/utils/types'
 import PostComp from '@/components/posts/Post.vue'
 import UserProfile from '@/components/users/UserProfile.vue'
 import PostFooterFeed from '@/components/posts/PostFooterFeed.vue'
+import FollowingTab from '@/components/users/FollowingTab.vue'
 
 const PAGE_SIZE = 10
 
 const user = await getUser()
+
 const {
   posts,
   error,
@@ -110,15 +112,18 @@ async function getUser(): Promise<User | null> {
 
 <template>
   <template v-if="user">
-    <div class="space-y-3 md:space-y-5 px-3">
+    <div class="px-3">
       <UserProfile :user="user" />
-      <div v-for="post in posts" :key="post.id">
-        <PostComp :post="post">
-          <PostFooterFeed :id="post.id" />
-        </PostComp>
-      </div>
-      <div v-if="isLoading" class="w-full text-center">
-        <box-icon name="loader-circle" animation="spin" color="white"></box-icon>
+      <FollowingTab :user="user" />
+      <div class="space-y-3 md:space-y-5">
+        <div v-for="post in posts" :key="post.id">
+          <PostComp :post="post">
+            <PostFooterFeed :id="post.id" />
+          </PostComp>
+        </div>
+        <div v-if="isLoading" class="w-full text-center">
+          <box-icon name="loader-circle" animation="spin" color="white"></box-icon>
+        </div>
       </div>
     </div>
   </template>
